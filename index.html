@@ -55,6 +55,33 @@
   .nav-cta:hover { background: var(--gold-bright); border-color: var(--gold-bright); }
   .nav-toggle { display: none; background: none; border: none; color: var(--parchment); font-size: 1.4rem; cursor: pointer; }
 
+  /* ── dynamic dropdown nav ── */
+  .nav-dropdown { position: relative; display: inline-block; }
+  .nav-dropdown > .dd-btn {
+    background: none; border: none; color: var(--parchment-dim); font-family: 'Sarabun', sans-serif;
+    font-size: .88rem; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 4px;
+  }
+  .nav-dropdown > .dd-btn:hover { color: var(--gold-bright); }
+  .nav-dropdown .dd-menu {
+    display: none; position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+    background: var(--forest-mid); border: 1px solid var(--forest-line); border-radius: 6px;
+    min-width: 170px; padding: 6px; z-index: 60; box-shadow: 0 10px 24px rgba(0,0,0,.4);
+  }
+  .nav-dropdown:hover .dd-menu { display: block; }
+  .nav-dropdown .dd-menu a {
+    display: block; padding: 9px 12px; font-size: .85rem; color: var(--parchment-dim); border-radius: 4px;
+  }
+  .nav-dropdown .dd-menu a:hover { background: rgba(203,159,46,.12); color: var(--gold-bright); }
+  .mobile-dd-group { padding: 12px 4px 4px; font-size: .74rem; color: var(--moss); letter-spacing: .05em; }
+  .mobile-dd-item { padding-left: 14px !important; }
+
+  /* ── generic content page ── */
+  .content-page {
+    max-width: 760px; margin: 0 auto; padding: 20px 0;
+  }
+  .content-page h2 { font-family: 'Taviraj', serif; color: var(--gold-bright); font-size: 1.7rem; margin-bottom: 20px; }
+  .content-page p { color: var(--parchment-dim); font-size: .96rem; margin-bottom: 14px; line-height: 1.8; }
+
   /* ── Hero ── */
   .hero {
     position: relative; padding: 100px 28px 120px; text-align: center;
@@ -415,6 +442,7 @@
       <a href="#gallery">คลังภาพ</a>
       <a href="#faq">คำถาม</a>
       <a href="#contact">ติดต่อ</a>
+      <span id="navExtra"></span>
     </nav>
     <a class="nav-cta" href="#library">ห้องสมุดธรรมะ</a>
     <button class="nav-toggle" id="navToggle" aria-label="เปิดเมนู">☰</button>
@@ -427,6 +455,7 @@
     <a href="#gallery">คลังภาพ</a>
     <a href="#faq">คำถามที่พบบ่อย</a>
     <a href="#contact">ติดต่อ</a>
+    <span id="mobileNavExtra"></span>
     <a class="btn solid" href="#library">ห้องสมุดธรรมะ</a>
   </div>
 </header>
@@ -573,6 +602,8 @@
   <div class="faq-list" id="faqList"></div>
 </section>
 
+<div id="dynamicPagesContainer"></div>
+
 <footer id="contact">
   <div class="footer-grid">
     <div class="footer-brand">
@@ -630,6 +661,7 @@
       <button class="admin-tab-btn" onclick="switchAdminTab(this,'faq')">คำถามที่พบบ่อย</button>
       <button class="admin-tab-btn" onclick="switchAdminTab(this,'audio')">เสียงธรรม</button>
       <button class="admin-tab-btn" onclick="switchAdminTab(this,'quotes')">โอวาทธรรม</button>
+      <button class="admin-tab-btn" onclick="switchAdminTab(this,'pages')">หน้าเนื้อหา</button>
     </div>
 
     <!-- คลังภาพ -->
@@ -697,6 +729,26 @@
       </div>
       <p style="color:var(--parchment-dim);font-size:.8rem;margin-bottom:20px">หน้าแรกจะแสดงคำสอนที่เพิ่มล่าสุดเสมอ</p>
       <div id="adminQuotesList"></div>
+    </div>
+
+    <!-- หน้าเนื้อหา (สร้างเมนู dropdown เอง) -->
+    <div class="admin-section" id="admin-pages">
+      <div class="admin-row-form">
+        <div class="admin-field"><label>ชื่อกลุ่มเมนู</label>
+          <input type="text" id="a-page-group" placeholder="เช่น เกี่ยวกับวัด" list="pageGroupList">
+          <datalist id="pageGroupList"></datalist>
+        </div>
+        <div class="admin-field"><label>ชื่อหัวข้อ</label><input type="text" id="a-page-title" placeholder="เช่น ประวัติวัด"></div>
+      </div>
+      <div class="admin-field">
+        <label>เนื้อหา (ขึ้นบรรทัดใหม่ = แยกย่อหน้า)</label>
+        <textarea id="a-page-content"></textarea>
+      </div>
+      <button class="admin-btn" onclick="adminAddPage()">+ เพิ่มหน้าเนื้อหา</button>
+      <p style="color:var(--parchment-dim);font-size:.8rem;margin:14px 0 20px">
+        พิมพ์ "ชื่อกลุ่มเมนู" เดียวกับกลุ่มที่มีอยู่แล้ว เพื่อรวมอยู่ใน dropdown เดิม หรือพิมพ์ชื่อกลุ่มใหม่ เพื่อสร้าง dropdown ใหม่ขึ้นมาเองอัตโนมัติ (ถ้าเว้นว่างไว้ จะขึ้นเป็นเมนูเดี่ยวไม่มี dropdown)
+      </p>
+      <div id="adminPagesList"></div>
     </div>
   </div>
 </div>
@@ -769,7 +821,7 @@
 
   /* ══════════════ CMS: โหลด/แสดงเนื้อหาจาก Google Sheets ══════════════ */
   const CMS_API_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
-  let cmsGallery = [], cmsSchedule = [], cmsFaq = [], cmsHistory = '', cmsAudio = [], cmsQuotes = [];
+  let cmsGallery = [], cmsSchedule = [], cmsFaq = [], cmsHistory = '', cmsAudio = [], cmsQuotes = [], cmsPages = [];
 
   function extractDriveId(link) {
     if (!link) return null;
@@ -801,6 +853,7 @@
       cmsHistory = data.history || '';
       cmsAudio = data.audio || [];
       cmsQuotes = data.quotes || [];
+      cmsPages = data.pages || [];
     } catch (err) {
       console.error('โหลดข้อมูล CMS ไม่สำเร็จ (ใช้เนื้อหาตัวอย่างแทน)', err);
       return;
@@ -811,6 +864,74 @@
     renderFaq();
     renderAudioPlaylist();
     renderQuote();
+    renderDynamicNavAndPages();
+  }
+
+  /* ══════════════ หน้าเนื้อหาที่สร้างเอง + เมนู dropdown อัตโนมัติ ══════════════ */
+  function renderDynamicNavAndPages() {
+    // สร้าง section หน้าเนื้อหาแต่ละอัน (ลบของเก่าก่อนแล้วสร้างใหม่)
+    const container = document.getElementById('dynamicPagesContainer');
+    container.innerHTML = '';
+    cmsPages.forEach(p => {
+      const sec = document.createElement('section');
+      sec.id = p.slug;
+      sec.innerHTML = `
+        <div class="content-page">
+          <h2>${p.title}</h2>
+          ${(p.content || '').split('\n').filter(t => t.trim()).map(t => `<p>${t}</p>`).join('')}
+        </div>`;
+      container.appendChild(sec);
+    });
+
+    // จัดกลุ่มตาม group เพื่อสร้าง dropdown
+    const groups = {};
+    const topLevel = [];
+    cmsPages.forEach(p => {
+      const g = (p.group || '').trim();
+      if (!g) { topLevel.push(p); return; }
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(p);
+    });
+
+    // เดสก์ท็อป
+    const navExtra = document.getElementById('navExtra');
+    navExtra.innerHTML = '';
+    topLevel.forEach(p => {
+      const a = document.createElement('a');
+      a.href = '#' + p.slug;
+      a.textContent = p.title;
+      navExtra.appendChild(a);
+    });
+    Object.keys(groups).forEach(g => {
+      const dd = document.createElement('span');
+      dd.className = 'nav-dropdown';
+      dd.innerHTML = `<button class="dd-btn">${g} ▾</button>
+        <div class="dd-menu">${groups[g].map(p => `<a href="#${p.slug}">${p.title}</a>`).join('')}</div>`;
+      navExtra.appendChild(dd);
+    });
+
+    // มือถือ
+    const mobileExtra = document.getElementById('mobileNavExtra');
+    mobileExtra.innerHTML = '';
+    topLevel.forEach(p => {
+      const a = document.createElement('a');
+      a.href = '#' + p.slug;
+      a.textContent = p.title;
+      mobileExtra.appendChild(a);
+    });
+    Object.keys(groups).forEach(g => {
+      const label = document.createElement('div');
+      label.className = 'mobile-dd-group';
+      label.textContent = g;
+      mobileExtra.appendChild(label);
+      groups[g].forEach(p => {
+        const a = document.createElement('a');
+        a.className = 'mobile-dd-item';
+        a.href = '#' + p.slug;
+        a.textContent = p.title;
+        mobileExtra.appendChild(a);
+      });
+    });
   }
 
   function renderHistory() {
@@ -977,6 +1098,7 @@
     renderAdminFaqList();
     renderAdminAudioList();
     renderAdminQuotesList();
+    renderAdminPagesList();
   }
   function switchAdminTab(btn, key) {
     document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
@@ -1170,6 +1292,44 @@
     if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
     await loadCmsData();
     renderAdminQuotesList();
+  }
+
+  /* ── หน้าเนื้อหา (Pages) — สร้างเมนู dropdown เองอัตโนมัติ ── */
+  function renderAdminPagesList() {
+    const el = document.getElementById('adminPagesList');
+    el.innerHTML = '';
+    cmsPages.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'admin-list-item';
+      row.innerHTML = `
+        <div class="info">${p.title}${p.group ? ` <span style="color:var(--moss)">— กลุ่ม: ${p.group}</span>` : ''}<div class="sub">${(p.content || '').slice(0, 60)}...</div></div>
+        <div class="actions"><button class="danger" onclick="adminDeletePage('${p.id}')">ลบ</button></div>`;
+      el.appendChild(row);
+    });
+    // อัปเดตรายชื่อกลุ่มที่มีอยู่แล้ว ให้เลือกซ้ำได้ง่าย
+    const groups = [...new Set(cmsPages.map(p => p.group).filter(Boolean))];
+    document.getElementById('pageGroupList').innerHTML = groups.map(g => `<option value="${g}">`).join('');
+  }
+  async function adminAddPage() {
+    const group = document.getElementById('a-page-group').value.trim();
+    const title = document.getElementById('a-page-title').value.trim();
+    const content = document.getElementById('a-page-content').value;
+    if (!title || !content.trim()) { alert('กรอกชื่อหัวข้อและเนื้อหาก่อนนะครับ'); return; }
+    const result = await apiPost({ action: 'addPage', group, title, content });
+    if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+    document.getElementById('a-page-group').value = '';
+    document.getElementById('a-page-title').value = '';
+    document.getElementById('a-page-content').value = '';
+    await loadCmsData();
+    renderAdminPagesList();
+    alert('เพิ่มหน้าเนื้อหาแล้ว ✅ ตรวจดูเมนูบนเว็บได้เลย');
+  }
+  async function adminDeletePage(id) {
+    if (!confirm('ลบหน้านี้ใช่ไหม?')) return;
+    const result = await apiPost({ action: 'deletePage', id });
+    if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+    await loadCmsData();
+    renderAdminPagesList();
   }
 </script>
 
