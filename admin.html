@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แผงควบคุม — วัดป่ามหาไชย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Taviraj:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest-deep: #141F17; --forest-mid: #26382B; --forest-line: #3D5240;
+    --moss: #9AB89C; --gold: #CB9F2E; --gold-bright: #F0C55C; --clay: #A15630;
+    --parchment: #F1E9D8; --parchment-dim: #BEB49D; --danger: #c05a4a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--forest-deep); color: var(--parchment);
+    font-family: 'Sarabun', sans-serif; min-height: 100vh;
+  }
+  h1, h2, h3 { font-family: 'Taviraj', serif; }
+  a { color: inherit; }
+
+  /* ══════════════ LOGIN ══════════════ */
+  .login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse 900px 500px at 50% -10%, rgba(203,159,46,.10), transparent 70%), var(--forest-deep);
+    padding: 20px;
+  }
+  .login-card {
+    width: 100%; max-width: 360px; text-align: center;
+    background: var(--forest-mid); border: 1px solid var(--forest-line); border-radius: 12px;
+    padding: 44px 32px;
+  }
+  .login-card .wheel { width: 52px; height: 52px; margin: 0 auto 18px; }
+  .login-card h1 { font-size: 1.3rem; color: var(--gold-bright); margin-bottom: 6px; }
+  .login-card p { font-size: .84rem; color: var(--parchment-dim); margin-bottom: 26px; }
+  .login-card input {
+    width: 100%; padding: 13px 16px; border-radius: 6px; text-align: center; letter-spacing: .1em;
+    border: 1px solid var(--forest-line); background: var(--forest-deep); color: var(--parchment);
+    font-family: 'Sarabun', sans-serif; font-size: 1rem;
+  }
+  .login-card input:focus { outline: none; border-color: var(--gold); }
+  .login-card button {
+    width: 100%; margin-top: 14px; background: var(--gold); color: var(--forest-deep); border: none;
+    font-weight: 700; padding: 13px; border-radius: 6px; cursor: pointer; font-family: 'Sarabun', sans-serif; font-size: .95rem;
+  }
+  .login-card button:hover { background: var(--gold-bright); }
+  .login-card .back-link { display: inline-block; margin-top: 20px; font-size: .8rem; color: var(--parchment-dim); }
+  .login-card .back-link:hover { color: var(--gold-bright); }
+
+  /* ══════════════ DASHBOARD LAYOUT ══════════════ */
+  .dash { display: none; min-height: 100vh; }
+  .dash.open { display: flex; }
+
+  .sidebar {
+    width: 250px; flex-shrink: 0; background: #101911; border-right: 1px solid var(--forest-line);
+    display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .sidebar-brand { padding: 24px 20px; border-bottom: 1px solid var(--forest-line); display: flex; align-items: center; gap: 10px; }
+  .sidebar-brand .wheel { width: 34px; height: 34px; flex-shrink: 0; }
+  .sidebar-brand .titles h2 { font-size: .98rem; color: var(--gold-bright); line-height: 1.3; }
+  .sidebar-brand .titles span { font-size: .7rem; color: var(--parchment-dim); }
+  .sidebar-nav { flex: 1; padding: 14px 12px; display: flex; flex-direction: column; gap: 3px; }
+  .sidebar-nav button {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    background: none; border: none; color: var(--parchment-dim); padding: 11px 14px; border-radius: 7px;
+    cursor: pointer; font-family: 'Sarabun', sans-serif; font-size: .88rem;
+  }
+  .sidebar-nav button:hover { background: rgba(203,159,46,.08); color: var(--parchment); }
+  .sidebar-nav button.active { background: rgba(203,159,46,.14); color: var(--gold-bright); font-weight: 600; }
+  .sidebar-nav .icon { width: 20px; text-align: center; flex-shrink: 0; }
+  .sidebar-foot { padding: 14px 12px; border-top: 1px solid var(--forest-line); display: flex; flex-direction: column; gap: 3px; }
+  .sidebar-foot a, .sidebar-foot button {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 7px;
+    font-size: .84rem; color: var(--parchment-dim); text-decoration: none; cursor: pointer;
+    background: none; border: none; width: 100%; text-align: left; font-family: 'Sarabun', sans-serif;
+  }
+  .sidebar-foot a:hover, .sidebar-foot button:hover { background: rgba(203,159,46,.08); color: var(--gold-bright); }
+
+  .main { flex: 1; min-width: 0; padding: 30px 40px 80px; max-width: 980px; }
+  .main-head { margin-bottom: 30px; }
+  .main-head h1 { font-size: 1.5rem; color: var(--gold-bright); margin-bottom: 6px; }
+  .main-head p { font-size: .86rem; color: var(--parchment-dim); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* dashboard stat cards */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 10px; }
+  .stat-card {
+    background: var(--forest-mid); border: 1px solid var(--forest-line); border-radius: 10px;
+    padding: 20px; cursor: pointer; transition: border-color .2s, transform .2s;
+  }
+  .stat-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .stat-card .num { font-family: 'Taviraj', serif; font-size: 2rem; color: var(--gold-bright); }
+  .stat-card .label { font-size: .82rem; color: var(--parchment-dim); margin-top: 4px; }
+  .quick-note {
+    margin-top: 30px; padding: 18px 20px; border: 1px dashed var(--forest-line); border-radius: 8px;
+    font-size: .84rem; color: var(--parchment-dim); line-height: 1.8;
+  }
+  .quick-note b { color: var(--parchment); }
+
+  /* ── shared form/list styles ── */
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: .82rem; color: var(--moss); margin-bottom: 6px; }
+  .field input, .field textarea {
+    width: 100%; padding: 11px 14px; border-radius: 6px;
+    border: 1px solid var(--forest-line); background: var(--forest-mid); color: var(--parchment);
+    font-family: 'Sarabun', sans-serif; font-size: .92rem;
+  }
+  .field input:focus, .field textarea:focus { outline: none; border-color: var(--gold); }
+  .field textarea { min-height: 130px; resize: vertical; }
+  .row-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 10px; }
+  .row-form .field { flex: 1; min-width: 160px; margin-bottom: 0; }
+  .btn {
+    background: var(--gold); color: var(--forest-deep); border: none; font-weight: 700;
+    padding: 12px 22px; border-radius: 6px; cursor: pointer; font-family: 'Sarabun', sans-serif;
+    font-size: .88rem; white-space: nowrap;
+  }
+  .btn:hover { background: var(--gold-bright); }
+  .btn.outline { background: transparent; border: 1px solid var(--forest-line); color: var(--parchment); font-weight: 600; }
+  .btn.outline:hover { border-color: var(--gold); color: var(--gold-bright); }
+  .hint { font-size: .78rem; color: var(--parchment-dim); margin: 6px 0 22px; line-height: 1.7; }
+  .section-title { font-size: .8rem; color: var(--moss); letter-spacing: .05em; margin: 26px 0 12px; text-transform: uppercase; }
+  .list-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 14px 16px; border: 1px solid var(--forest-line); border-radius: 8px; margin-bottom: 8px;
+    background: rgba(255,255,255,.015);
+  }
+  .list-item .info { flex: 1; min-width: 0; font-size: .88rem; color: var(--parchment); }
+  .list-item .info .sub { color: var(--parchment-dim); font-size: .78rem; margin-top: 3px; }
+  .list-item .actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .list-item .actions button {
+    background: none; border: 1px solid var(--forest-line); color: var(--parchment-dim);
+    padding: 7px 13px; border-radius: 5px; font-size: .78rem; cursor: pointer; font-family: 'Sarabun', sans-serif;
+  }
+  .list-item .actions button:hover { border-color: var(--gold); color: var(--gold-bright); }
+  .list-item .actions button.danger:hover { border-color: var(--danger); color: #e08272; }
+  .thumb { width: 44px; height: 44px; border-radius: 5px; object-fit: cover; flex-shrink: 0; }
+  .empty-note { color: var(--parchment-dim); font-size: .84rem; padding: 20px 0; text-align: center; }
+
+  .nav-toggle-mobile { display: none; }
+  @media (max-width: 860px) {
+    .dash.open { flex-direction: column; }
+    .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; }
+    .sidebar-brand { width: 100%; }
+    .sidebar-nav { flex-direction: row; flex-wrap: wrap; }
+    .sidebar-foot { width: 100%; flex-direction: row; flex-wrap: wrap; }
+    .main { padding: 24px 18px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <svg class="wheel" viewBox="0 0 100 100"><g fill="none" stroke="#CB9F2E" stroke-width="4"><circle cx="50" cy="50" r="42"/><circle cx="50" cy="50" r="7"/><line x1="50" y1="10" x2="50" y2="90"/><line x1="10" y1="50" x2="90" y2="50"/><line x1="22" y1="22" x2="78" y2="78"/><line x1="78" y1="22" x2="22" y2="78"/></g></svg>
+    <h1>แผงควบคุมเว็บวัด</h1>
+    <p>วัดป่ามหาไชย — สำหรับผู้ดูแลเว็บไซต์เท่านั้น</p>
+    <input type="password" id="passInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter') tryLogin()">
+    <button onclick="tryLogin()">เข้าสู่ระบบ</button>
+    <a class="back-link" href="index.html">‹ กลับไปหน้าเว็บ</a>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div class="dash" id="dash">
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <svg class="wheel" viewBox="0 0 100 100"><g fill="none" stroke="#CB9F2E" stroke-width="4"><circle cx="50" cy="50" r="42"/><circle cx="50" cy="50" r="7"/><line x1="50" y1="10" x2="50" y2="90"/><line x1="10" y1="50" x2="90" y2="50"/><line x1="22" y1="22" x2="78" y2="78"/><line x1="78" y1="22" x2="22" y2="78"/></g></svg>
+      <div class="titles"><h2>วัดป่ามหาไชย</h2><span>แผงควบคุมเว็บไซต์</span></div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+      <button class="active" onclick="switchPanel(this,'dashboard')"><span class="icon">📊</span> แดชบอร์ด</button>
+      <button onclick="switchPanel(this,'gallery')"><span class="icon">🖼️</span> คลังภาพ</button>
+      <button onclick="switchPanel(this,'history')"><span class="icon">📜</span> ประวัติวัด</button>
+      <button onclick="switchPanel(this,'schedule')"><span class="icon">🗓️</span> ตารางกิจกรรม</button>
+      <button onclick="switchPanel(this,'faq')"><span class="icon">❓</span> คำถามที่พบบ่อย</button>
+      <button onclick="switchPanel(this,'audio')"><span class="icon">🎧</span> เสียงธรรม</button>
+      <button onclick="switchPanel(this,'quotes')"><span class="icon">🪷</span> โอวาทธรรม</button>
+      <button onclick="switchPanel(this,'pages')"><span class="icon">📄</span> หน้าเนื้อหา</button>
+    </nav>
+    <div class="sidebar-foot">
+      <a href="index.html" target="_blank">🔗 ดูเว็บจริง</a>
+      <button onclick="logout()">🚪 ออกจากระบบ</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- แดชบอร์ด -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="main-head"><h1>ภาพรวมเว็บไซต์</h1><p>สรุปเนื้อหาทั้งหมดที่มีอยู่ในระบบตอนนี้</p></div>
+      <div class="stat-grid">
+        <div class="stat-card" onclick="jumpTo('gallery')"><div class="num" id="statGallery">0</div><div class="label">🖼️ รูปในคลังภาพ</div></div>
+        <div class="stat-card" onclick="jumpTo('schedule')"><div class="num" id="statSchedule">0</div><div class="label">🗓️ รายการตารางกิจกรรม</div></div>
+        <div class="stat-card" onclick="jumpTo('faq')"><div class="num" id="statFaq">0</div><div class="label">❓ คำถามที่พบบ่อย</div></div>
+        <div class="stat-card" onclick="jumpTo('audio')"><div class="num" id="statAudio">0</div><div class="label">🎧 ไฟล์เสียงธรรม</div></div>
+        <div class="stat-card" onclick="jumpTo('quotes')"><div class="num" id="statQuotes">0</div><div class="label">🪷 โอวาทธรรม</div></div>
+        <div class="stat-card" onclick="jumpTo('pages')"><div class="num" id="statPages">0</div><div class="label">📄 หน้าเนื้อหา</div></div>
+      </div>
+      <div class="quick-note">
+        💡 <b>เคล็ดลับ:</b> ทุกอย่างที่แก้ไขในนี้จะขึ้นบนหน้าเว็บจริงทันที ไม่ต้องกด "เผยแพร่" ใดๆ เพิ่มเติม —
+        ถ้าอยากดูผลลัพธ์ กด "🔗 ดูเว็บจริง" ที่เมนูซ้ายได้เลย
+      </div>
+    </div>
+
+    <!-- คลังภาพ -->
+    <div class="panel" id="panel-gallery">
+      <div class="main-head"><h1>🖼️ คลังภาพ</h1><p>รูปภาพกิจกรรมที่แสดงในหน้าแรกและหน้าคลังภาพ</p></div>
+      <div class="row-form">
+        <div class="field"><label>ลิงก์รูปจาก Google Drive</label><input type="text" id="a-gallery-link" placeholder="วางลิงก์ Drive ที่นี่"></div>
+        <div class="field"><label>คำบรรยายภาพ</label><input type="text" id="a-gallery-caption" placeholder="เช่น กิจกรรมวันวิสาขบูชา"></div>
+        <button class="btn" onclick="adminAddGallery()">+ เพิ่มรูป</button>
+      </div>
+      <p class="hint">วิธีหาลิงก์: อัปโหลดรูปขึ้น Google Drive → คลิกขวา → แชร์ → เปลี่ยนเป็น "ทุกคนที่มีลิงก์" → คัดลอกลิงก์มาวาง</p>
+      <div class="section-title">รายการทั้งหมด</div>
+      <div id="listGallery"></div>
+    </div>
+
+    <!-- ประวัติวัด -->
+    <div class="panel" id="panel-history">
+      <div class="main-head"><h1>📜 ประวัติวัด</h1><p>เนื้อหาที่แสดงในส่วน "ประวัติวัด" หน้าแรก</p></div>
+      <div class="field">
+        <label>เนื้อหาประวัติวัด (ขึ้นบรรทัดใหม่ = แยกย่อหน้า)</label>
+        <textarea id="a-history-text"></textarea>
+      </div>
+      <button class="btn" onclick="adminSaveHistory()">💾 บันทึกประวัติ</button>
+    </div>
+
+    <!-- ตารางกิจกรรม -->
+    <div class="panel" id="panel-schedule">
+      <div class="main-head"><h1>🗓️ ตารางกิจกรรม</h1><p>กำหนดการกิจกรรมของวัด แสดงเป็นแท็บตามหมวดในหน้าแรก</p></div>
+      <div class="row-form">
+        <div class="field"><label>หมวด</label><input type="text" id="a-sched-cat" placeholder="เช่น ประจำวัน"></div>
+        <div class="field"><label>เวลา</label><input type="text" id="a-sched-time" placeholder="เช่น 05:30 น."></div>
+        <div class="field"><label>รายละเอียด</label><input type="text" id="a-sched-desc" placeholder="เช่น ทำวัตรเช้า"></div>
+        <button class="btn" onclick="adminAddSchedule()">+ เพิ่ม</button>
+      </div>
+      <div class="section-title">รายการทั้งหมด</div>
+      <div id="listSchedule"></div>
+    </div>
+
+    <!-- คำถามที่พบบ่อย -->
+    <div class="panel" id="panel-faq">
+      <div class="main-head"><h1>❓ คำถามที่พบบ่อย</h1><p>คำถาม-คำตอบที่แสดงแบบเปิด-ปิดในหน้าแรก</p></div>
+      <div class="row-form">
+        <div class="field"><label>คำถาม</label><input type="text" id="a-faq-q" placeholder="เช่น ต้องจองล่วงหน้าไหม"></div>
+        <div class="field"><label>คำตอบ</label><input type="text" id="a-faq-a" placeholder="คำตอบ"></div>
+        <button class="btn" onclick="adminAddFaq()">+ เพิ่ม</button>
+      </div>
+      <div class="section-title">รายการทั้งหมด</div>
+      <div id="listFaq"></div>
+    </div>
+
+    <!-- เสียงธรรม -->
+    <div class="panel" id="panel-audio">
+      <div class="main-head"><h1>🎧 เสียงธรรม</h1><p>ไฟล์เสียงที่เล่นในเครื่องเล่นหน้าแรก (เล่นต่อเนื่องอัตโนมัติ)</p></div>
+      <div class="row-form">
+        <div class="field"><label>ชื่อไฟล์เสียง</label><input type="text" id="a-audio-title" placeholder="เช่น เทศน์เรื่องความไม่ประมาท"></div>
+        <div class="field"><label>ประเภท</label>
+          <input type="text" id="a-audio-type" placeholder="เทศน์ / บทสวดมนต์" list="audioTypeList">
+          <datalist id="audioTypeList"><option value="เทศน์/บรรยายธรรมะ"><option value="บทสวดมนต์"></datalist>
+        </div>
+        <div class="field"><label>ลิงก์ไฟล์เสียงจาก Google Drive</label><input type="text" id="a-audio-link" placeholder="วางลิงก์ Drive ที่นี่"></div>
+        <button class="btn" onclick="adminAddAudio()">+ เพิ่มไฟล์เสียง</button>
+      </div>
+      <p class="hint">อัปโหลด mp3 ขึ้น Google Drive → แชร์เป็น "ทุกคนที่มีลิงก์" → วางลิงก์ที่นี่ กด "ปักเป็นเพลงเด่น" เพื่อให้ไฟล์นั้นเล่นเป็นอันดับแรกเสมอ</p>
+      <div class="section-title">รายการทั้งหมด</div>
+      <div id="listAudio"></div>
+    </div>
+
+    <!-- โอวาทธรรม -->
+    <div class="panel" id="panel-quotes">
+      <div class="main-head"><h1>🪷 โอวาทธรรม</h1><p>คำสอนสั้นๆ ที่แสดงในหน้าแรก — โชว์อันล่าสุดเสมอ</p></div>
+      <div class="row-form">
+        <div class="field"><label>ข้อความโอวาทธรรม</label><input type="text" id="a-quote-text" placeholder="เช่น ศึกษาธรรม นำปฏิบัติ..."></div>
+        <div class="field"><label>ผู้กล่าว</label><input type="text" id="a-quote-author" placeholder="เช่น พระครูสิริสุตวราภรณ์"></div>
+        <button class="btn" onclick="adminAddQuote()">+ เพิ่ม</button>
+      </div>
+      <div class="section-title">รายการทั้งหมด</div>
+      <div id="listQuotes"></div>
+    </div>
+
+    <!-- หน้าเนื้อหา -->
+    <div class="panel" id="panel-pages">
+      <div class="main-head"><h1>📄 หน้าเนื้อหา</h1><p>สร้างหน้าใหม่และจัดกลุ่มเมนู dropdown บนแถบเมนูได้เอง</p></div>
+      <div class="row-form">
+        <div class="field"><label>ชื่อกลุ่มเมนู</label>
+          <input type="text" id="a-page-group" placeholder="ประวัติ / ปฏิบัติธรรม / เสียงธรรม / กิจกรรม" list="pageGroupList">
+          <datalist id="pageGroupList">
+            <option value="ประวัติ"><option value="ปฏิบัติธรรม"><option value="เสียงธรรม"><option value="กิจกรรม">
+          </datalist>
+        </div>
+        <div class="field"><label>ชื่อหัวข้อ</label><input type="text" id="a-page-title" placeholder="เช่น ประวัติวัด"></div>
+      </div>
+      <div class="field">
+        <label>เนื้อหา (ขึ้นบรรทัดใหม่ = แยกย่อหน้า)</label>
+        <textarea id="a-page-content"></textarea>
+      </div>
+      <button class="btn" id="pageSubmitBtn" onclick="adminAddPage()">+ เพิ่มหน้าเนื้อหา</button>
+      <button class="btn outline" id="pageCancelBtn" onclick="adminCancelEditPage()" style="display:none">ยกเลิกการแก้ไข</button>
+      <p class="hint">พิมพ์ชื่อกลุ่ม <b>ประวัติ / ปฏิบัติธรรม / เสียงธรรม / กิจกรรม</b> เพื่อให้หัวข้อนี้ไปโผล่ใน dropdown ที่มีอยู่แล้วบนแถบเมนู หรือพิมพ์ชื่อกลุ่มใหม่ที่ยังไม่เคยมี เพื่อสร้าง dropdown ใหม่ขึ้นมาเองอัตโนมัติ (เว้นว่างไว้ = ขึ้นเป็นเมนูเดี่ยว)</p>
+      <div class="section-title">รายการทั้งหมด</div>
+      <div id="listPages"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ══════════════ ตั้งค่า ══════════════ */
+const CMS_API_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+const ADMIN_PASSWORD = '1234'; // ⚠️ แนะนำให้เปลี่ยนก่อนเผยแพร่จริง
+
+let cmsGallery = [], cmsSchedule = [], cmsFaq = [], cmsHistory = '', cmsAudio = [], cmsQuotes = [], cmsPages = [];
+const FIXED_NAV_GROUPS = ['ประวัติ', 'ปฏิบัติธรรม', 'เสียงธรรม', 'กิจกรรม'];
+
+/* ══════════════ Login ══════════════ */
+function tryLogin() {
+  const val = document.getElementById('passInput').value;
+  if (val === ADMIN_PASSWORD) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dash').classList.add('open');
+    loadCmsData();
+  } else {
+    alert('รหัสผ่านไม่ถูกต้อง');
+  }
+}
+function logout() {
+  document.getElementById('dash').classList.remove('open');
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('passInput').value = '';
+}
+
+/* ══════════════ Panel switching ══════════════ */
+function switchPanel(btn, key) {
+  document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-' + key).classList.add('active');
+}
+function jumpTo(key) {
+  const btn = [...document.querySelectorAll('.sidebar-nav button')].find(b => b.getAttribute('onclick').includes("'" + key + "'"));
+  if (btn) switchPanel(btn, key);
+}
+
+/* ══════════════ Helpers ══════════════ */
+function extractDriveId(link) {
+  if (!link) return null;
+  let m = link.match(/\/file\/d\/([a-zA-Z0-9_-]{20,})/);
+  if (m) return m[1];
+  m = link.match(/[?&]id=([a-zA-Z0-9_-]{20,})/);
+  if (m) return m[1];
+  if (/^[a-zA-Z0-9_-]{20,}$/.test(link.trim())) return link.trim();
+  return null;
+}
+async function apiPost(payload) {
+  try {
+    const res = await fetch(CMS_API_URL, { method: 'POST', body: JSON.stringify(payload) });
+    return await res.json();
+  } catch (err) {
+    console.error(err);
+    return { success: false, error: 'เชื่อมต่อไม่สำเร็จ' };
+  }
+}
+
+/* ══════════════ โหลดข้อมูลทั้งหมด ══════════════ */
+async function loadCmsData() {
+  try {
+    const res = await fetch(CMS_API_URL);
+    const data = await res.json();
+    cmsGallery = data.gallery || [];
+    cmsSchedule = data.schedule || [];
+    cmsFaq = data.faq || [];
+    cmsHistory = data.history || '';
+    cmsAudio = data.audio || [];
+    cmsQuotes = data.quotes || [];
+    cmsPages = data.pages || [];
+  } catch (err) {
+    console.error(err);
+    alert('โหลดข้อมูลจาก Google Sheets ไม่สำเร็จ — เช็คการเชื่อมต่ออินเทอร์เน็ต หรือ URL ของ Apps Script ในไฟล์นี้');
+    return;
+  }
+  document.getElementById('a-history-text').value = cmsHistory;
+  renderListGallery();
+  renderListSchedule();
+  renderListFaq();
+  renderListAudio();
+  renderListQuotes();
+  renderListPages();
+  updateStats();
+}
+function updateStats() {
+  document.getElementById('statGallery').textContent = cmsGallery.length;
+  document.getElementById('statSchedule').textContent = cmsSchedule.length;
+  document.getElementById('statFaq').textContent = cmsFaq.length;
+  document.getElementById('statAudio').textContent = cmsAudio.length;
+  document.getElementById('statQuotes').textContent = cmsQuotes.length;
+  document.getElementById('statPages').textContent = cmsPages.length;
+}
+
+/* ══════════════ คลังภาพ ══════════════ */
+function renderListGallery() {
+  const el = document.getElementById('listGallery');
+  if (!cmsGallery.length) { el.innerHTML = '<div class="empty-note">ยังไม่มีรูปภาพ</div>'; return; }
+  el.innerHTML = '';
+  cmsGallery.forEach(item => {
+    const driveId = extractDriveId(item.imageLink);
+    const row = document.createElement('div');
+    row.className = 'list-item';
+    row.innerHTML = `
+      ${driveId ? `<img class="thumb" src="https://drive.google.com/thumbnail?id=${driveId}&sz=w100">` : ''}
+      <div class="info">${item.caption || '(ไม่มีคำบรรยาย)'}</div>
+      <div class="actions"><button class="danger" onclick="adminDeleteGallery('${item.id}')">ลบ</button></div>`;
+    el.appendChild(row);
+  });
+}
+async function adminAddGallery() {
+  const link = document.getElementById('a-gallery-link').value.trim();
+  const caption = document.getElementById('a-gallery-caption').value.trim();
+  if (!link) { alert('วางลิงก์รูปก่อนนะครับ'); return; }
+  const result = await apiPost({ action: 'addGallery', imageLink: link, caption });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  document.getElementById('a-gallery-link').value = '';
+  document.getElementById('a-gallery-caption').value = '';
+  await loadCmsData();
+}
+async function adminDeleteGallery(id) {
+  if (!confirm('ลบรูปนี้ใช่ไหม?')) return;
+  const result = await apiPost({ action: 'deleteGallery', id });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  await loadCmsData();
+}
+
+/* ══════════════ ประวัติวัด ══════════════ */
+async function adminSaveHistory() {
+  const text = document.getElementById('a-history-text').value;
+  const result = await apiPost({ action: 'saveHistory', text });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  cmsHistory = text;
+  alert('บันทึกประวัติวัดแล้ว ✅');
+}
+
+/* ══════════════ ตารางกิจกรรม ══════════════ */
+function renderListSchedule() {
+  const el = document.getElementById('listSchedule');
+  if (!cmsSchedule.length) { el.innerHTML = '<div class="empty-note">ยังไม่มีรายการ</div>'; return; }
+  el.innerHTML = '';
+  cmsSchedule.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'list-item';
+    row.innerHTML = `
+      <div class="info">${s.category} — ${s.time}<div class="sub">${s.description}</div></div>
+      <div class="actions"><button class="danger" onclick="adminDeleteSchedule('${s.id}')">ลบ</button></div>`;
+    el.appendChild(row);
+  });
+}
+async function adminAddSchedule() {
+  const category = document.getElementById('a-sched-cat').value.trim();
+  const time = document.getElementById('a-sched-time').value.trim();
+  const description = document.getElementById('a-sched-desc').value.trim();
+  if (!category || !time || !description) { alert('กรอกข้อมูลให้ครบก่อนนะครับ'); return; }
+  const result = await apiPost({ action: 'addSchedule', category, time, description });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  document.getElementById('a-sched-cat').value = '';
+  document.getElementById('a-sched-time').value = '';
+  document.getElementById('a-sched-desc').value = '';
+  await loadCmsData();
+}
+async function adminDeleteSchedule(id) {
+  if (!confirm('ลบรายการนี้ใช่ไหม?')) return;
+  const result = await apiPost({ action: 'deleteSchedule', id });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  await loadCmsData();
+}
+
+/* ══════════════ คำถามที่พบบ่อย ══════════════ */
+function renderListFaq() {
+  const el = document.getElementById('listFaq');
+  if (!cmsFaq.length) { el.innerHTML = '<div class="empty-note">ยังไม่มีคำถาม</div>'; return; }
+  el.innerHTML = '';
+  cmsFaq.forEach(f => {
+    const row = document.createElement('div');
+    row.className = 'list-item';
+    row.innerHTML = `
+      <div class="info">${f.question}<div class="sub">${f.answer}</div></div>
+      <div class="actions"><button class="danger" onclick="adminDeleteFaq('${f.id}')">ลบ</button></div>`;
+    el.appendChild(row);
+  });
+}
+async function adminAddFaq() {
+  const question = document.getElementById('a-faq-q').value.trim();
+  const answer = document.getElementById('a-faq-a').value.trim();
+  if (!question || !answer) { alert('กรอกคำถามและคำตอบก่อนนะครับ'); return; }
+  const result = await apiPost({ action: 'addFaq', question, answer });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  document.getElementById('a-faq-q').value = '';
+  document.getElementById('a-faq-a').value = '';
+  await loadCmsData();
+}
+async function adminDeleteFaq(id) {
+  if (!confirm('ลบคำถามนี้ใช่ไหม?')) return;
+  const result = await apiPost({ action: 'deleteFaq', id });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  await loadCmsData();
+}
+
+/* ══════════════ เสียงธรรม ══════════════ */
+function renderListAudio() {
+  const el = document.getElementById('listAudio');
+  if (!cmsAudio.length) { el.innerHTML = '<div class="empty-note">ยังไม่มีไฟล์เสียง</div>'; return; }
+  el.innerHTML = '';
+  cmsAudio.forEach(a => {
+    const isFeatured = String(a.featured).toUpperCase() === 'TRUE';
+    const row = document.createElement('div');
+    row.className = 'list-item';
+    row.innerHTML = `
+      <div class="info">${isFeatured ? '⭐ ' : ''}${a.title}<div class="sub">${a.audioType || ''}</div></div>
+      <div class="actions">
+        ${!isFeatured ? `<button onclick="adminSetFeaturedAudio('${a.id}')">ปักเป็นเพลงเด่น</button>` : ''}
+        <button class="danger" onclick="adminDeleteAudio('${a.id}')">ลบ</button>
+      </div>`;
+    el.appendChild(row);
+  });
+}
+async function adminAddAudio() {
+  const title = document.getElementById('a-audio-title').value.trim();
+  const audioType = document.getElementById('a-audio-type').value.trim();
+  const driveLink = document.getElementById('a-audio-link').value.trim();
+  if (!title || !driveLink) { alert('กรอกชื่อไฟล์และลิงก์ให้ครบก่อนนะครับ'); return; }
+  const result = await apiPost({ action: 'addAudio', title, audioType, driveLink });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  document.getElementById('a-audio-title').value = '';
+  document.getElementById('a-audio-type').value = '';
+  document.getElementById('a-audio-link').value = '';
+  await loadCmsData();
+}
+async function adminDeleteAudio(id) {
+  if (!confirm('ลบไฟล์เสียงนี้ใช่ไหม?')) return;
+  const result = await apiPost({ action: 'deleteAudio', id });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  await loadCmsData();
+}
+async function adminSetFeaturedAudio(id) {
+  const result = await apiPost({ action: 'setFeaturedAudio', id });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  await loadCmsData();
+  alert('ปักเป็นเพลงเด่นแล้ว ✅ จะเป็นเพลงแรกที่เล่นในหน้าแรก');
+}
+
+/* ══════════════ โอวาทธรรม ══════════════ */
+function renderListQuotes() {
+  const el = document.getElementById('listQuotes');
+  if (!cmsQuotes.length) { el.innerHTML = '<div class="empty-note">ยังไม่มีโอวาทธรรม</div>'; return; }
+  el.innerHTML = '';
+  cmsQuotes.forEach(q => {
+    const row = document.createElement('div');
+    row.className = 'list-item';
+    row.innerHTML = `
+      <div class="info">${q.quote}<div class="sub">— ${q.author || ''}</div></div>
+      <div class="actions"><button class="danger" onclick="adminDeleteQuote('${q.id}')">ลบ</button></div>`;
+    el.appendChild(row);
+  });
+}
+async function adminAddQuote() {
+  const quote = document.getElementById('a-quote-text').value.trim();
+  const author = document.getElementById('a-quote-author').value.trim();
+  if (!quote) { alert('กรอกข้อความโอวาทธรรมก่อนนะครับ'); return; }
+  const result = await apiPost({ action: 'addQuote', quote, author });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  document.getElementById('a-quote-text').value = '';
+  document.getElementById('a-quote-author').value = '';
+  await loadCmsData();
+}
+async function adminDeleteQuote(id) {
+  if (!confirm('ลบโอวาทธรรมนี้ใช่ไหม?')) return;
+  const result = await apiPost({ action: 'deleteQuote', id });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  await loadCmsData();
+}
+
+/* ══════════════ หน้าเนื้อหา ══════════════ */
+let editingPageId = null;
+function renderListPages() {
+  const el = document.getElementById('listPages');
+  if (!cmsPages.length) { el.innerHTML = '<div class="empty-note">ยังไม่มีหน้าเนื้อหา</div>'; }
+  else {
+    el.innerHTML = '';
+    cmsPages.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'list-item';
+      row.innerHTML = `
+        <div class="info">${p.title}${p.group ? ` <span style="color:var(--moss)">— กลุ่ม: ${p.group}</span>` : ''}<div class="sub">${(p.content || '').slice(0, 60)}...</div></div>
+        <div class="actions">
+          <button onclick="adminEditPage('${p.id}')">แก้ไข</button>
+          <button class="danger" onclick="adminDeletePage('${p.id}')">ลบ</button>
+        </div>`;
+      el.appendChild(row);
+    });
+  }
+  const groups = [...new Set([...FIXED_NAV_GROUPS, ...cmsPages.map(p => p.group).filter(Boolean)])];
+  document.getElementById('pageGroupList').innerHTML = groups.map(g => `<option value="${g}">`).join('');
+}
+function adminEditPage(id) {
+  const p = cmsPages.find(x => x.id === id);
+  if (!p) return;
+  editingPageId = id;
+  document.getElementById('a-page-group').value = p.group || '';
+  document.getElementById('a-page-title').value = p.title || '';
+  document.getElementById('a-page-content').value = p.content || '';
+  document.getElementById('pageSubmitBtn').textContent = '💾 บันทึกการแก้ไข';
+  document.getElementById('pageCancelBtn').style.display = 'inline-block';
+  document.getElementById('a-page-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function adminCancelEditPage() {
+  editingPageId = null;
+  document.getElementById('a-page-group').value = '';
+  document.getElementById('a-page-title').value = '';
+  document.getElementById('a-page-content').value = '';
+  document.getElementById('pageSubmitBtn').textContent = '+ เพิ่มหน้าเนื้อหา';
+  document.getElementById('pageCancelBtn').style.display = 'none';
+}
+async function adminAddPage() {
+  const group = document.getElementById('a-page-group').value.trim();
+  const title = document.getElementById('a-page-title').value.trim();
+  const content = document.getElementById('a-page-content').value;
+  if (!title || !content.trim()) { alert('กรอกชื่อหัวข้อและเนื้อหาก่อนนะครับ'); return; }
+  let result;
+  if (editingPageId) {
+    const existing = cmsPages.find(x => x.id === editingPageId);
+    result = await apiPost({ action: 'editPage', id: editingPageId, group, title, slug: existing ? existing.slug : '', content });
+  } else {
+    result = await apiPost({ action: 'addPage', group, title, content });
+  }
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  const wasEditing = !!editingPageId;
+  adminCancelEditPage();
+  await loadCmsData();
+  alert(wasEditing ? 'บันทึกการแก้ไขแล้ว ✅' : 'เพิ่มหน้าเนื้อหาแล้ว ✅ ตรวจดูเมนูบนเว็บได้เลย');
+}
+async function adminDeletePage(id) {
+  if (!confirm('ลบหน้านี้ใช่ไหม?')) return;
+  const result = await apiPost({ action: 'deletePage', id });
+  if (!result.success) { alert('เกิดข้อผิดพลาด: ' + result.error); return; }
+  if (editingPageId === id) adminCancelEditPage();
+  await loadCmsData();
+}
+</script>
+</body>
+</html>
