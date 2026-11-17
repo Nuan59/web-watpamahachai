@@ -1,0 +1,182 @@
+// SQLite for one small server; portable to Postgres by switching provider + url.
+// Enums are strings (SQLite has none); allowed values live in src/lib/enums.ts.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(cuid())
+  email        String        @unique
+  name         String
+  passwordHash String
+  role         String // OWNER | ADMIN | EDITOR
+  perms        String        @default("{}") // JSON {module: "vced"} overrides of the role defaults
+  active       Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  logs         ActivityLog[]
+  posts        Post[]
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId  String?
+  detail    String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+/// Key/value temple info edited in Admin → ข้อมูลวัด (address, phone, bank, history text…).
+model Setting {
+  key   String @id
+  value String
+}
+
+/// News and activity reports (ข่าวสารและกิจกรรม). Body is Markdown.
+model Post {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  title       String
+  excerpt     String    @default("")
+  body        String    @default("")
+  coverKey    String?
+  status      String    @default("DRAFT") // DRAFT | PUBLISHED
+  publishedAt DateTime?
+  authorId    String?
+  author      User?     @relation(fields: [authorId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, publishedAt])
+}
+
+/// Dated activities: holy days, retreats, ordination programmes. May accept sign-ups.
+model Event {
+  id            String         @id @default(cuid())
+  slug          String         @unique
+  title         String
+  kind          String         @default("CEREMONY") // CEREMONY | RETREAT | ORDINATION | OTHER
+  startDate     DateTime // date only, stored at 00:00 Bangkok time
+  endDate       DateTime
+  timeText      String         @default("") // "เริ่ม 08:00 น."
+  location      String         @default("")
+  summary       String         @default("")
+  body          String         @default("")
+  coverKey      String?
+  published     Boolean        @default(true)
+  signupOpen    Boolean        @default(false)
+  capacity      Int? // null = no limit
+  lockVersion   Int            @default(0) // bumped to lock the row while a sign-up is checked
+  createdAt     DateTime       @default(now())
+  registrations Registration[]
+
+  @@index([startDate])
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name      String
+  phone     String
+  age       Int?
+  gender    String   @default("") // MALE | FEMALE | ""
+  people    Int      @default(1)
+  note      String   @default("")
+  status    String   @default("NEW") // NEW | CONFIRMED | CANCELLED
+  createdAt DateTime @default(now())
+
+  @@index([eventId, status])
+}
+
+/// Rows of the regular timetable, grouped by category tab (กิจวัตรประจำวัน, วันพระ…).
+model ScheduleItem {
+  id       String @id @default(cuid())
+  category String
+  time     String
+  title    String
+  sort     Int    @default(0)
+}
+
+/// Dhamma talks and chanting. Either an uploaded file (fileKey) or an outside link (url, e.g. Google Drive).
+model AudioTrack {
+  id        String   @id @default(cuid())
+  title     String
+  speaker   String   @default("")
+  category  String   @default("ธรรมบรรยาย")
+  fileKey   String?
+  url       String   @default("")
+  featured  Boolean  @default(false)
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Quote {
+  id        String   @id @default(cuid())
+  text      String
+  author    String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Album {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  date      DateTime?
+  summary   String   @default("")
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  photos    Photo[]
+}
+
+model Photo {
+  id        String   @id @default(cuid())
+  albumId   String
+  album     Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  key       String
+  caption   String   @default("")
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Faq {
+  id       String @id @default(cuid())
+  category String @default("ทั่วไป")
+  question String
+  answer   String
+  sort     Int    @default(0)
+}
+
+/// Extra content pages the admin writes (shown in the menu under a group).
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  navGroup  String   @default("") // "" = not in the menu
+  body      String   @default("")
+  published Boolean  @default(true)
+  sort      Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+/// Contact form messages from the public site.
+model Message {
+  id        String    @id @default(cuid())
+  name      String
+  contact   String
+  topic     String    @default("GENERAL") // GENERAL | PRACTICE | ORDINATION | DONATION | GROUP
+  body      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([readAt])
+}

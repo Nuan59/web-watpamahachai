@@ -1,0 +1,82 @@
+@import "tailwindcss";
+/* Sarabun: body text. Taviraj: headings (a Thai serif that suits a temple). */
+@import "@fontsource/sarabun/thai-400.css";
+@import "@fontsource/sarabun/thai-500.css";
+@import "@fontsource/sarabun/thai-600.css";
+@import "@fontsource/sarabun/latin-400.css";
+@import "@fontsource/sarabun/latin-500.css";
+@import "@fontsource/sarabun/latin-600.css";
+@import "@fontsource/taviraj/thai-500.css";
+@import "@fontsource/taviraj/thai-600.css";
+@import "@fontsource/taviraj/latin-500.css";
+@import "@fontsource/taviraj/latin-600.css";
+
+/* Colours taken from the temple logo: brown lettering, charcoal, grey dots, white ground. */
+@theme {
+  --color-brown: #744a24;
+  --color-brown-dark: #5e3a1a;
+  --color-brown-tint: #f3e9dd;
+  --color-ink: #2f2f2f;
+  --color-muted: #5a534d;
+  --color-grey: #6e6f73;
+  --color-paper: #fbf8f3;
+  --color-cream: #f4ede3;
+  --color-line: #e0d3c2;
+  --color-ok: #2f6b3f;
+  --color-ok-tint: #e5f0e7;
+  --color-warn: #8a5a00;
+  --color-warn-tint: #fbf1d6;
+  --color-bad: #a3301f;
+  --font-sans: "Sarabun", system-ui, sans-serif;
+  --font-display: "Taviraj", "Sarabun", serif;
+}
+
+html { color-scheme: light; scroll-behavior: smooth; }
+body { background: var(--color-paper); color: var(--color-ink); font-family: var(--font-sans); line-height: 1.7; }
+/* Thai needs room above and below for vowels and tone marks. */
+h1, h2, h3 { font-family: var(--font-display); line-height: 1.35; font-weight: 600; color: var(--color-brown-dark); }
+h4 { font-weight: 600; line-height: 1.4; }
+:focus-visible { outline: 2px solid var(--color-brown); outline-offset: 2px; }
+.skip-link { position: absolute; left: -9999px; }
+.skip-link:focus { left: 1rem; top: 1rem; z-index: 100; background: #fff; padding: .5rem 1rem; border: 2px solid var(--color-brown); }
+
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-6xl px-4 sm:px-6; }
+  .btn { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-5 py-2 font-semibold text-ink transition-colors hover:border-brown hover:text-brown-dark disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer; }
+  .btn-primary { @apply border-brown bg-brown text-white hover:bg-brown-dark hover:border-brown-dark hover:text-white; }
+  .btn-sm { @apply min-h-9 px-3 py-1 text-sm; }
+  .btn-danger { @apply border-bad/50 text-bad hover:border-bad hover:text-bad; }
+  .label { @apply mb-1 block text-sm font-medium text-ink; }
+  .input { @apply min-h-11 w-full rounded-md border border-[#bfae98] bg-white px-3 py-2 text-base text-ink placeholder:text-grey hover:border-brown focus:border-brown focus:outline-none; }
+  .hint { @apply text-sm text-muted; }
+  .eyebrow { @apply inline-flex items-center gap-3 text-sm tracking-wide text-grey; }
+  .eyebrow::before, .eyebrow::after { content: ""; @apply h-px w-6 bg-line; }
+  .card { @apply rounded-lg border border-line bg-white; }
+  .tbl { @apply w-full border-collapse text-sm; }
+  .tbl th { @apply whitespace-nowrap border-b border-line px-3 py-2 text-left font-medium text-muted; }
+  .tbl td { @apply border-b border-cream px-3 py-2 align-top; }
+  .num { font-variant-numeric: tabular-nums; }
+}
+
+/* Content written in the back office (news, events, pages). */
+.prose-wat { max-width: 70ch; font-size: 1.0625rem; line-height: 1.85; }
+.prose-wat > * + * { margin-top: 1em; }
+.prose-wat h2 { font-size: 1.5rem; margin-top: 1.6em; }
+.prose-wat h3 { font-size: 1.2rem; margin-top: 1.4em; }
+.prose-wat a { color: var(--color-brown); text-decoration: underline; text-underline-offset: 3px; }
+.prose-wat ul { list-style: disc; padding-left: 1.4em; }
+.prose-wat ol { list-style: decimal; padding-left: 1.4em; }
+.prose-wat li::marker { color: var(--color-brown); }
+.prose-wat blockquote { border-left: 3px solid var(--color-brown); padding-left: 1em; font-family: var(--font-display); color: var(--color-brown-dark); }
+.prose-wat img { width: 100%; height: auto; border-radius: 8px; }
+.prose-wat table { width: 100%; border-collapse: collapse; }
+.prose-wat th, .prose-wat td { border-bottom: 1px solid var(--color-line); padding: .4em .6em; text-align: left; }
+
+.hero-bg {
+  background:
+    radial-gradient(ellipse 900px 480px at 50% -10%, rgba(116,74,36,.09), transparent 70%),
+    repeating-linear-gradient(115deg, transparent 0 26px, rgba(116,74,36,.035) 26px 27px),
+    linear-gradient(180deg, var(--color-paper), var(--color-cream));
+}
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
