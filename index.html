@@ -416,6 +416,120 @@
   @media (max-width: 640px) {
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
   }
+
+  /* ══════════ ส่วนเพิ่มเติม: รายละเอียดหน้าเว็บ ══════════ */
+  .home-sec { padding: 90px 28px; }
+  .home-sec.alt { background: var(--forest-mid); }
+  .stat-strip {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+    max-width: 1080px; margin: 0 auto; background: var(--forest-line);
+    border: 1px solid var(--forest-line); border-radius: 6px; overflow: hidden;
+  }
+  .stat { background: var(--forest-deep); padding: 26px 18px; text-align: center; }
+  .stat b { display: block; font-family: 'Taviraj', serif; font-size: 1.7rem; color: var(--gold-bright); font-weight: 600; line-height: 1.3; }
+  .stat span { font-size: .82rem; color: var(--parchment-dim); }
+
+  .intro-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; max-width: 1080px; margin: 0 auto; align-items: center; }
+  .intro-grid h2 { font-size: clamp(1.6rem, 3.2vw, 2.1rem); color: var(--gold-bright); font-weight: 600; margin-bottom: 18px; }
+  .intro-grid p { color: var(--parchment-dim); margin-bottom: 14px; }
+  .pillars { display: grid; gap: 14px; }
+  .pillar { display: flex; gap: 16px; align-items: flex-start; padding: 18px 20px; border: 1px solid var(--forest-line); border-radius: 6px; background: rgba(38,56,43,.45); }
+  .pillar .num { font-family: 'Taviraj', serif; font-size: 1.5rem; color: var(--gold); line-height: 1; min-width: 26px; }
+  .pillar h4 { font-size: 1rem; color: var(--parchment); font-weight: 600; margin-bottom: 2px; }
+  .pillar p { font-size: .86rem; color: var(--parchment-dim); margin: 0; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; max-width: 1080px; margin: 0 auto; }
+  .card-grid.two { grid-template-columns: repeat(2, 1fr); }
+  .card-grid.four { grid-template-columns: repeat(4, 1fr); }
+  .link-card {
+    display: flex; flex-direction: column; gap: 8px; padding: 28px 24px;
+    background: var(--forest-deep); border: 1px solid var(--forest-line); border-radius: 6px;
+    transition: border-color .2s, transform .2s;
+  }
+  .home-sec:not(.alt) .link-card { background: var(--forest-mid); }
+  .link-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .link-card .ic { font-size: 1.5rem; }
+  .link-card h3 { font-size: 1.1rem; color: var(--parchment); font-weight: 500; }
+  .link-card p { font-size: .86rem; color: var(--parchment-dim); flex: 1; }
+  .link-card .go { font-size: .82rem; color: var(--gold-bright); }
+
+  .info-card { background: var(--forest-mid); border: 1px solid var(--forest-line); border-radius: 6px; padding: 28px 26px; }
+  .info-card h3 { font-size: 1.12rem; color: var(--gold-bright); font-weight: 600; margin-bottom: 14px; display: flex; gap: 10px; align-items: center; }
+  .info-card p { color: var(--parchment-dim); font-size: .9rem; margin-bottom: 10px; }
+  .info-card ul, .info-card ol { padding-left: 20px; color: var(--parchment-dim); font-size: .9rem; }
+  .info-card li { margin-bottom: 7px; }
+  .info-card li::marker { color: var(--gold); }
+  .info-card .muted { font-size: .78rem; color: var(--moss); margin-top: 10px; }
+
+  .sub-head { max-width: 1080px; margin: 70px auto 26px; display: flex; align-items: center; gap: 14px; }
+  .sub-head h3 { font-family: 'Taviraj', serif; font-size: 1.4rem; color: var(--gold-bright); font-weight: 600; white-space: nowrap; }
+  .sub-head::after { content: ''; flex: 1; height: 1px; background: var(--forest-line); }
+
+  .steps { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; counter-reset: st; }
+  .step { position: relative; padding: 26px 20px 22px; border: 1px solid var(--forest-line); border-radius: 6px; background: var(--forest-mid); }
+  .step::before {
+    counter-increment: st; content: counter(st);
+    position: absolute; top: -14px; left: 20px; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--gold); color: var(--forest-deep); font-weight: 700; font-size: .85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step h4 { color: var(--parchment); font-size: .98rem; margin-bottom: 6px; font-weight: 600; }
+  .step p { color: var(--parchment-dim); font-size: .85rem; }
+
+  .precepts { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 28px; list-style: none; counter-reset: pc; }
+  .precepts li { counter-increment: pc; display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--forest-line); color: var(--parchment-dim); font-size: .9rem; }
+  .precepts li::before { content: counter(pc); font-family: 'Taviraj', serif; color: var(--gold); font-size: 1.05rem; min-width: 18px; }
+
+  .timeline { max-width: 760px; margin: 0 auto; border-left: 2px solid var(--forest-line); padding-left: 28px; }
+  .tl-item { position: relative; padding-bottom: 28px; }
+  .tl-item::before { content: ''; position: absolute; left: -36px; top: 7px; width: 14px; height: 14px; border-radius: 50%; background: var(--forest-deep); border: 2px solid var(--gold); }
+  .tl-item .when { color: var(--gold); font-size: .82rem; font-weight: 600; }
+  .tl-item h4 { color: var(--parchment); font-size: 1rem; font-weight: 600; margin: 2px 0 4px; }
+  .tl-item p { color: var(--parchment-dim); font-size: .88rem; }
+
+  .holy-days { max-width: 1080px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .holy { border: 1px solid var(--forest-line); border-left: 3px solid var(--gold); border-radius: 4px; padding: 18px 20px; background: var(--forest-mid); }
+  .holy b { display: block; color: var(--parchment); font-size: 1rem; margin-bottom: 2px; }
+  .holy .lunar { color: var(--gold); font-size: .78rem; margin-bottom: 6px; display: block; }
+  .holy p { color: var(--parchment-dim); font-size: .84rem; }
+
+  .notice {
+    max-width: 1080px; margin: 0 auto 30px; padding: 14px 18px; border-radius: 6px;
+    border: 1px dashed rgba(203,159,46,.5); background: rgba(203,159,46,.06);
+    color: var(--parchment-dim); font-size: .84rem;
+  }
+  .notice b { color: var(--gold-bright); }
+
+  .map-wrap { border: 1px solid var(--forest-line); border-radius: 6px; overflow: hidden; aspect-ratio: 16/10; background: var(--forest-mid); }
+  .map-wrap iframe { width: 100%; height: 100%; border: 0; filter: grayscale(.2) contrast(1.05); }
+  .contact-list { list-style: none; display: grid; gap: 14px; }
+  .contact-list li { display: flex; gap: 14px; align-items: flex-start; }
+  .contact-list .ci { width: 38px; height: 38px; flex-shrink: 0; border-radius: 50%; border: 1px solid var(--forest-line); display: flex; align-items: center; justify-content: center; }
+  .contact-list small { display: block; color: var(--moss); font-size: .76rem; }
+  .contact-list a, .contact-list span.v { color: var(--parchment); font-size: .95rem; }
+  .contact-list a:hover { color: var(--gold-bright); }
+
+  .content-page { max-width: 760px; margin: 0 auto; }
+  .content-page h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); color: var(--gold-bright); margin-bottom: 24px; text-align: center; }
+  .content-page p { color: var(--parchment-dim); margin-bottom: 14px; }
+  .back-home-link { display: inline-block; color: var(--moss); font-size: .85rem; margin-bottom: 30px; }
+  .back-home-link:hover { color: var(--gold-bright); }
+  .faq-item.open .faq-a { max-height: 640px; }
+  .faq-cat { max-width: 760px; margin: 34px auto 4px; color: var(--moss); font-size: .8rem; letter-spacing: .08em; }
+  .faq-cat:first-child { margin-top: 0; }
+
+  @media (max-width: 860px) {
+    .stat-strip { grid-template-columns: repeat(2, 1fr); }
+    .intro-grid, .card-grid, .card-grid.two, .card-grid.four, .holy-days, .precepts { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: repeat(2, 1fr); gap: 26px 16px; }
+    section, .home-sec { padding: 70px 16px; }
+    .wrap, .nav-inner { padding-left: 16px; padding-right: 16px; }
+  }
+  @media (max-width: 520px) {
+    .steps { grid-template-columns: 1fr; }
+    .hero-audio .audio-player { padding: 14px; gap: 12px; }
+    .library { padding: 40px 22px; }
+  }
 </style>
 </head>
 <body>
@@ -429,13 +543,14 @@
     <nav class="links">
       <span class="nav-dropdown">
         <button class="dd-btn">ประวัติ ▾</button>
-        <div class="dd-menu" id="ddMenu-ประวัติ"><a href="#about">ประวัติวัด</a></div>
+        <div class="dd-menu" id="ddMenu-ประวัติ"><a href="#about">ประวัติวัด</a><a href="#quotes">โอวาทธรรม</a></div>
       </span>
       <span class="nav-dropdown">
         <button class="dd-btn">ปฏิบัติธรรม ▾</button>
         <div class="dd-menu" id="ddMenu-ปฏิบัติธรรม">
           <a href="#practice">แนวทางปฏิบัติ</a>
           <a href="#schedule">ตารางกิจกรรม</a>
+          <a href="#faq">เตรียมตัวก่อนมาวัด</a>
         </div>
       </span>
       <span class="nav-dropdown">
@@ -446,8 +561,8 @@
         <button class="dd-btn">กิจกรรม ▾</button>
         <div class="dd-menu" id="ddMenu-กิจกรรม"><a href="#gallery">คลังภาพ</a></div>
       </span>
-      <a href="#faq">คำถาม</a>
-      <a href="#contact">ติดต่อ</a>
+      <a href="#donate">ร่วมทำบุญ</a>
+      <a href="#visit">ติดต่อ/เดินทาง</a>
       <span id="navExtra"></span>
     </nav>
     <a class="nav-cta" href="#library">ห้องสมุดธรรมะ</a>
@@ -456,6 +571,7 @@
   <div class="mobile-panel" id="mobilePanel">
     <div class="mobile-dd-group">ประวัติ</div>
     <a class="mobile-dd-item" href="#about">ประวัติวัด</a>
+    <a class="mobile-dd-item" href="#quotes">โอวาทธรรม</a>
     <span id="mobileDdMenu-ประวัติ"></span>
 
     <div class="mobile-dd-group">ปฏิบัติธรรม</div>
@@ -472,7 +588,8 @@
     <span id="mobileDdMenu-กิจกรรม"></span>
 
     <a href="#faq">คำถามที่พบบ่อย</a>
-    <a href="#contact">ติดต่อ</a>
+    <a href="#donate">ร่วมทำบุญ</a>
+    <a href="#visit">ติดต่อ / การเดินทาง</a>
     <span id="mobileNavExtra"></span>
     <a class="btn solid" href="#library">ห้องสมุดธรรมะ</a>
   </div>
@@ -510,6 +627,67 @@
   </div>
 </section>
 
+<div id="homeOverview">
+<section class="home-sec" style="padding-top:60px">
+  <div class="stat-strip">
+    <div class="stat"><b>พ.ศ. ๒๕๓๓</b><span>เจ้าอาวาสรูปปัจจุบันเริ่มปกครองวัด</span></div>
+    <div class="stat"><b>๓ พันธกิจ</b><span>ศึกษา · ปฏิบัติ · เผยแพร่ธรรม</span></div>
+    <div class="stat"><b>เปิดทุกวัน</b><span>ประชาชนทั่วไปเข้ากราบพระได้</span></div>
+    <div class="stat"><b>ฟรี</b><span>ห้องสมุดและเสียงธรรมออนไลน์</span></div>
+  </div>
+</section>
+
+<section class="home-sec alt">
+  <div class="intro-grid">
+    <div>
+      <div class="eyebrow" style="margin-bottom:14px">ยินดีต้อนรับ</div>
+      <h2>สำนักปฏิบัติธรรมประจำจังหวัดสมุทรสาคร</h2>
+      <p>วัดป่ามหาไชย ตั้งอยู่ที่ตำบลบ้านเกาะ อำเภอเมือง จังหวัดสมุทรสาคร เป็นวัดสายปฏิบัติที่เปิดให้พุทธศาสนิกชนทุกเพศทุกวัยได้เข้ามาศึกษาและปฏิบัติธรรม ในบรรยากาศสงบ เรียบง่าย เหมาะแก่การพักใจจากความวุ่นวายของชีวิตประจำวัน</p>
+      <p>ไม่ว่าจะเป็นผู้เริ่มต้นที่อยากลองนั่งสมาธิครั้งแรก หรือผู้ที่ต้องการบวชเพื่อศึกษาพระธรรมวินัยอย่างจริงจัง วัดมีกิจกรรมรองรับตามความพร้อมของแต่ละคน</p>
+      <a class="btn ghost" href="#about" style="margin-top:10px">อ่านประวัติวัด →</a>
+    </div>
+    <div class="pillars">
+      <div class="pillar"><div class="num">๑</div><div><h4>ศึกษาธรรม</h4><p>เรียนรู้หลักธรรมคำสอนของพระพุทธเจ้า ผ่านการฟังธรรม อ่านหนังสือ และการสนทนาธรรม</p></div></div>
+      <div class="pillar"><div class="num">๒</div><div><h4>ปฏิบัติธรรม</h4><p>ฝึกเจริญสติ สมาธิ และปัญญา ด้วยการสวดมนต์ เดินจงกรม และนั่งสมาธิ</p></div></div>
+      <div class="pillar"><div class="num">๓</div><div><h4>เผยแพร่ธรรม</h4><p>แบ่งปันธรรมะสู่สังคม ทั้งที่วัดและช่องทางออนไลน์ ให้ทุกคนเข้าถึงได้โดยไม่มีค่าใช้จ่าย</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="home-sec">
+  <div class="section-head">
+    <div class="eyebrow">เริ่มต้นที่นี่</div>
+    <h2>สิ่งที่คุณทำได้กับวัดป่ามหาไชย</h2>
+    <p>เลือกหัวข้อที่สนใจเพื่อดูรายละเอียดเพิ่มเติม</p>
+  </div>
+  <div class="card-grid">
+    <a class="link-card" href="#practice"><span class="ic">🪷</span><h3>มาปฏิบัติธรรม</h3><p>แนวทางการปฏิบัติ ขั้นตอนการสมัคร ศีล ๘ และสิ่งที่ต้องเตรียมก่อนเข้าวัด</p><span class="go">ดูแนวทาง →</span></a>
+    <a class="link-card" href="#schedule"><span class="ic">🗓️</span><h3>ตารางกิจกรรม</h3><p>กิจวัตรประจำวัน กิจกรรมวันพระ และวันสำคัญทางพระพุทธศาสนาตลอดปี</p><span class="go">ดูตาราง →</span></a>
+    <a class="link-card" href="#audio" onclick="setTimeout(()=>document.getElementById('audio').scrollIntoView({behavior:'smooth'}),10)"><span class="ic">🎧</span><h3>ฟังเสียงธรรม</h3><p>ฟังธรรมบรรยายและบทสวดมนต์ได้ทันทีจากหน้าแรก เล่นต่อเนื่องอัตโนมัติ</p><span class="go">ฟังเลย →</span></a>
+    <a class="link-card" href="#library"><span class="ic">📚</span><h3>ห้องสมุดธรรมะ</h3><p>อ่านหนังสือธรรมะฟรีผ่านมือถือ ไม่ต้องติดตั้งแอปใด ๆ</p><span class="go">เปิดห้องสมุด →</span></a>
+    <a class="link-card" href="#donate"><span class="ic">🙏</span><h3>ร่วมทำบุญ</h3><p>ถวายภัตตาหาร ร่วมสมทบทุนกิจกรรม และบริจาคหนังสือธรรมะ</p><span class="go">ดูช่องทาง →</span></a>
+    <a class="link-card" href="#visit"><span class="ic">📍</span><h3>การเดินทาง</h3><p>แผนที่ ที่อยู่ เบอร์โทรศัพท์ และคำแนะนำการมาวัดครั้งแรก</p><span class="go">ดูแผนที่ →</span></a>
+  </div>
+</section>
+
+<section class="home-sec alt">
+  <div class="section-head">
+    <div class="eyebrow">ปฏิทินพุทธศาสนา</div>
+    <h2>วันสำคัญที่วัดจัดกิจกรรม</h2>
+    <p>ร่วมทำบุญ ฟังธรรม และเวียนเทียนกับวัดในวันสำคัญทางพระพุทธศาสนา</p>
+  </div>
+  <div class="holy-days" id="homeHolyDays"></div>
+  <div style="text-align:center;margin-top:34px"><a class="btn ghost" href="#schedule">ดูตารางกิจกรรมทั้งหมด</a></div>
+</section>
+
+<section class="home-sec">
+  <div class="quote-card">
+    <div class="quote-text">“ศึกษาธรรม นำปฏิบัติ พัฒนาจิต คิดค้นทางพ้นทุกข์”</div>
+    <div class="quote-author">— โอวาทธรรม พระครูสิริสุตวราภรณ์ · <a href="#quotes" style="color:var(--gold-bright)">อ่านโอวาทธรรม</a></div>
+  </div>
+</section>
+</div>
+
 <section class="about route-view" id="about">
   <div style="max-width:1080px;margin:0 auto"><a class="back-home-link" href="#">‹ กลับหน้าแรก</a></div>
 
@@ -527,8 +705,25 @@
       <div id="historyText">
         <p>“มหาไชย” เป็นมงคลนามของวัด เป็นสถานที่ที่ก่อตั้งขึ้นเพื่อเป็นสำนักปฏิบัติธรรมประจำจังหวัดสมุทรสาคร ให้พุทธศาสนิกชนได้มีที่พึ่งทางใจ ศึกษาและปฏิบัติธรรมตามแนวทางของพระพุทธศาสนา</p>
         <p>ตลอดหลายสิบปีที่ผ่านมา วัดป่ามหาไชยได้เป็นสถานที่จัดกิจกรรมปฏิบัติธรรม อุปสมบทหมู่ และบวชชีพราหมณ์ให้กับพุทธศาสนิกชนในพื้นที่และใกล้เคียงอย่างต่อเนื่อง</p>
+        <p>แนวทางของวัดเน้นความเรียบง่ายแบบวัดป่า ใช้ชีวิตอย่างพอเพียง รักษาศีล เจริญสติ และอยู่ร่วมกันด้วยความเมตตา เพื่อให้ผู้ที่เข้ามาได้รับความสงบและนำธรรมะกลับไปใช้ในชีวิตประจำวันได้จริง</p>
       </div>
+      <a class="more" href="#practice">ดูแนวทางการปฏิบัติธรรม →</a>
     </div>
+  </div>
+
+  <div class="sub-head"><h3>ปณิธานของวัด</h3></div>
+  <div class="card-grid">
+    <div class="info-card"><h3>📖 ศึกษาธรรม</h3><p>ส่งเสริมให้พุทธศาสนิกชนเข้าใจหลักธรรมอย่างถูกต้อง ทั้งด้านปริยัติ (การเรียนรู้) และการนำไปใช้ในชีวิตจริง</p></div>
+    <div class="info-card"><h3>🧘 ปฏิบัติธรรม</h3><p>เป็นสถานที่สัปปายะสำหรับเจริญสติภาวนา มีกิจกรรมปฏิบัติธรรมทั้งแบบไป-กลับและแบบพักค้างที่วัด</p></div>
+    <div class="info-card"><h3>🌿 เผยแพร่ธรรม</h3><p>เผยแพร่ธรรมะผ่านการบรรยาย หนังสือ เสียงธรรม และสื่อออนไลน์ ให้ผู้ที่ไม่สะดวกเดินทางเข้าถึงธรรมะได้</p></div>
+  </div>
+
+  <div class="sub-head"><h3>เส้นทางของวัด</h3></div>
+  <div class="timeline">
+    <div class="tl-item"><div class="when">จุดเริ่มต้น</div><h4>ก่อตั้งเป็นสำนักปฏิบัติธรรม</h4><p>วัดได้รับการก่อตั้งขึ้นด้วยศรัทธาของพุทธศาสนิกชน เพื่อเป็นสถานที่ปฏิบัติธรรมประจำจังหวัดสมุทรสาคร โดยใช้มงคลนาม “มหาไชย”</p></div>
+    <div class="tl-item"><div class="when">๒๙ มิถุนายน พ.ศ. ๒๕๓๓</div><h4>พระมหาประกอบ ธมฺมชีโว รับตำแหน่งเจ้าอาวาส</h4><p>เริ่มวางแนวทางการศึกษาและปฏิบัติธรรมของวัด และนำพากิจกรรมปฏิบัติธรรมอย่างต่อเนื่อง</p></div>
+    <div class="tl-item"><div class="when">ต่อเนื่องหลายทศวรรษ</div><h4>อุปสมบทหมู่และบวชชีพราหมณ์</h4><p>จัดโครงการบวชระยะสั้นให้ประชาชนในจังหวัดและพื้นที่ใกล้เคียงได้ศึกษาพระธรรมวินัย</p></div>
+    <div class="tl-item"><div class="when">ปัจจุบัน</div><h4>เผยแพร่ธรรมสู่ออนไลน์</h4><p>เปิดห้องสมุดธรรมะออนไลน์และช่องทางฟังเสียงธรรม ให้ทุกคนศึกษาธรรมได้ทุกที่ทุกเวลา</p></div>
   </div>
 </section>
 
@@ -539,9 +734,13 @@
     <div class="eyebrow">โอวาทธรรม</div>
     <h2>คำสอนล่าสุด</h2>
   </div>
-  <div class="quote-card" id="quoteCard">
+  <div class="quote-card" id="quoteCard" style="margin-bottom:50px">
     <div class="quote-text">“ศึกษาธรรม นำปฏิบัติ พัฒนาจิต คิดค้นทางพ้นทุกข์”</div>
     <div class="quote-author">— โอวาทธรรม พระครูสิริสุตวราภรณ์</div>
+  </div>
+  <div class="card-grid two" style="max-width:860px">
+    <div class="info-card"><h3>ความหมายของโอวาท</h3><p><b style="color:var(--parchment)">ศึกษาธรรม</b> คือรู้ให้ถูก <b style="color:var(--parchment)">นำปฏิบัติ</b> คือทำให้จริง <b style="color:var(--parchment)">พัฒนาจิต</b> คือฝึกใจให้มีสติและสงบ <b style="color:var(--parchment)">คิดค้นทางพ้นทุกข์</b> คือใช้ปัญญาพิจารณาจนเห็นทางออกจากทุกข์ด้วยตนเอง</p></div>
+    <div class="info-card"><h3>นำไปใช้ในชีวิตประจำวัน</h3><ul><li>สวดมนต์หรือนั่งสมาธิวันละ ๕–๑๕ นาทีก่อนนอน</li><li>มีสติรู้ตัวในการพูดและการทำงาน</li><li>รักษาศีล ๕ เป็นพื้นฐานของความสุข</li><li>ฟังธรรมหรืออ่านหนังสือธรรมะสัปดาห์ละครั้ง</li></ul></div>
   </div>
 </section>
 
@@ -570,6 +769,40 @@
       <p>อ่านหนังสือธรรมะฟรีผ่านมือถือ ไม่ต้องเดินทางมาที่วัด สแกน QR หรือกดลิงก์เข้าอ่านได้ทันที</p>
     </div>
   </div>
+
+  <div class="sub-head"><h3>ขั้นตอนการมาปฏิบัติธรรม</h3></div>
+  <div class="steps">
+    <div class="step"><h4>ติดต่อสอบถาม</h4><p>โทร 085-379-5589 หรือทักเพจ Facebook เพื่อสอบถามรอบกิจกรรมและที่พักว่าง</p></div>
+    <div class="step"><h4>สมัครที่วัด</h4><p>สำหรับโครงการบวช ต้องสมัครด้วยตนเองที่วัด พร้อมบัตรประชาชนตัวจริง</p></div>
+    <div class="step"><h4>เตรียมตัว</h4><p>เตรียมชุดขาว ของใช้ส่วนตัว และร่างกายจิตใจให้พร้อม ดูรายการด้านล่าง</p></div>
+    <div class="step"><h4>เข้าวัด & ปฏิบัติ</h4><p>มาถึงก่อนเวลาเพื่อรายงานตัว รับฟังระเบียบ สมาทานศีล แล้วเริ่มปฏิบัติ</p></div>
+  </div>
+
+  <div class="sub-head"><h3>รูปแบบการปฏิบัติ</h3></div>
+  <div class="card-grid">
+    <div class="info-card"><h3>🙏 ทำวัตรสวดมนต์</h3><p>ทำวัตรเช้า-เย็นร่วมกัน เพื่อน้อมระลึกถึงคุณพระรัตนตรัยและเตรียมจิตก่อนภาวนา</p></div>
+    <div class="info-card"><h3>🚶 เดินจงกรม</h3><p>ฝึกสติผ่านการเดินช้า ๆ รู้ตัวทุกย่างก้าว ช่วยให้จิตตั้งมั่นและแก้ง่วง</p></div>
+    <div class="info-card"><h3>🧘 นั่งสมาธิ</h3><p>กำหนดรู้ลมหายใจหรือคำบริกรรม ฝึกให้จิตสงบและเห็นความเป็นจริงของกายใจ</p></div>
+  </div>
+
+  <div class="sub-head"><h3>ศีล ๘ สำหรับผู้มาปฏิบัติ</h3></div>
+  <ol class="precepts">
+    <li>เว้นจากการฆ่าและเบียดเบียนสัตว์</li>
+    <li>เว้นจากการลักทรัพย์ หยิบของที่ไม่ได้รับอนุญาต</li>
+    <li>เว้นจากการประพฤติผิดพรหมจรรย์</li>
+    <li>เว้นจากการพูดเท็จ ส่อเสียด หยาบคาย เพ้อเจ้อ</li>
+    <li>เว้นจากการดื่มสุราและสิ่งเสพติดทุกชนิด</li>
+    <li>เว้นจากการรับประทานอาหารหลังเที่ยงวัน</li>
+    <li>เว้นจากการฟ้อนรำ ขับร้อง ดูการละเล่น และการแต่งตัวด้วยเครื่องประดับ</li>
+    <li>เว้นจากการนอนบนที่นอนสูงใหญ่และหรูหรา</li>
+  </ol>
+
+  <div class="sub-head"><h3>สิ่งที่ควรรู้ก่อนมา</h3></div>
+  <div class="card-grid">
+    <div class="info-card"><h3>🎒 สิ่งที่ควรเตรียม</h3><ul><li>ชุดขาวสุภาพ (เสื้อขาว กางเกง/ผ้าถุงขาว) ๒–๓ ชุด</li><li>ผ้าห่มบาง หมอนเล็ก (ถ้าต้องการ)</li><li>ของใช้ส่วนตัว ยาประจำตัว</li><li>บัตรประชาชนตัวจริง</li><li>ยากันยุง ไฟฉาย กระบอกน้ำ</li></ul></div>
+    <div class="info-card"><h3>👕 การแต่งกาย</h3><ul><li>ผู้มาปฏิบัติธรรมแต่งชุดขาวล้วน</li><li>ผู้มาทำบุญทั่วไปแต่งกายสุภาพ สีสุภาพ</li><li>งดเสื้อแขนกุด สายเดี่ยว กางเกงขาสั้น กระโปรงสั้น</li><li>งดเครื่องประดับและเครื่องสำอางระหว่างปฏิบัติ</li></ul></div>
+    <div class="info-card"><h3>📵 ข้อควรปฏิบัติในวัด</h3><ul><li>ฝากหรือปิดโทรศัพท์ระหว่างปฏิบัติ</li><li>สำรวมกาย วาจา งดพูดคุยโดยไม่จำเป็น</li><li>ตรงต่อเวลาในทุกกิจกรรม</li><li>ช่วยกันรักษาความสะอาดของสถานที่</li></ul></div>
+  </div>
 </section>
 
 <div class="divider">
@@ -587,6 +820,11 @@
       <p>รวบรวมหนังสือธรรมะให้อ่านฟรี สแกน QR แล้วอ่านได้เลยจากมือถือ ไม่ต้องโหลดแอปเพิ่ม</p>
     </div>
     <a class="btn solid" href="https://nuan59.github.io/wat-mahachai-library/" target="_blank">เปิดห้องสมุด →</a>
+  </div>
+  <div class="card-grid" style="margin-top:30px">
+    <div class="info-card"><h3>📱 ใช้งานง่าย</h3><p>เปิดผ่านเบราว์เซอร์บนมือถือ แท็บเล็ต หรือคอมพิวเตอร์ ไม่ต้องสมัครสมาชิก ไม่ต้องติดตั้งแอป</p></div>
+    <div class="info-card"><h3>📖 อ่านได้ทุกที่</h3><p>เหมาะสำหรับผู้ที่ไม่สะดวกเดินทางมาวัด ผู้สูงอายุ หรือผู้ที่อยากอ่านธรรมะก่อนนอน</p></div>
+    <div class="info-card"><h3>🔗 แบ่งปันต่อได้</h3><p>ส่งลิงก์ห้องสมุดให้ครอบครัวและเพื่อน ๆ เป็นการเผยแพร่ธรรม ถือเป็นธรรมทานอย่างหนึ่ง</p></div>
   </div>
 </section>
 
@@ -617,8 +855,12 @@
     <h2>ตารางกิจกรรมของวัด</h2>
     <p>อัปเดตล่าสุดโดยทางวัด</p>
   </div>
+  <div class="notice" id="scheduleNotice">ℹ️ เวลาในตารางอาจเปลี่ยนแปลงตามกิจของวัด <b>โปรดโทรสอบถามก่อนเดินทาง 085-379-5589</b></div>
   <div class="tabs" id="scheduleTabs"></div>
   <div id="schedulePanels"></div>
+
+  <div class="sub-head"><h3>วันสำคัญทางพระพุทธศาสนา</h3></div>
+  <div class="holy-days" id="scheduleHolyDays"></div>
 </section>
 
 <section id="faq" class="route-view">
@@ -629,6 +871,50 @@
     <h2>อยากไปปฏิบัติธรรม ต้องรู้อะไรบ้าง</h2>
   </div>
   <div class="faq-list" id="faqList"></div>
+  <p style="text-align:center;margin-top:40px;color:var(--parchment-dim);font-size:.9rem">ไม่พบคำตอบที่ต้องการ? <a href="#visit" style="color:var(--gold-bright)">ติดต่อวัดโดยตรง →</a></p>
+</section>
+
+<section id="donate" class="route-view">
+  <div style="max-width:1080px;margin:0 auto"><a class="back-home-link" href="#">‹ กลับหน้าแรก</a></div>
+  <div class="section-head">
+    <div class="eyebrow">ร่วมบุญกับวัด</div>
+    <h2>ร่วมทำบุญ</h2>
+    <p>ทุกการให้ช่วยหล่อเลี้ยงพระศาสนา และเปิดโอกาสให้ผู้อื่นได้เข้าถึงธรรมะ</p>
+  </div>
+  <div class="card-grid">
+    <div class="info-card"><h3>🍚 ถวายภัตตาหาร</h3><p>ร่วมถวายภัตตาหารเช้า-เพลแด่พระภิกษุสามเณร และอาหารสำหรับผู้มาปฏิบัติธรรม</p><p class="muted">แจ้งความประสงค์ล่วงหน้ากับทางวัด</p></div>
+    <div class="info-card"><h3>🕯️ สมทบทุนกิจกรรม</h3><p>สนับสนุนโครงการอุปสมบทหมู่ บวชชีพราหมณ์ และงานปฏิบัติธรรมในวันสำคัญ</p><p class="muted">ร่วมได้ที่ตู้รับบริจาคภายในวัด หรือสอบถามช่องทางโอน</p></div>
+    <div class="info-card"><h3>📚 ธรรมทาน</h3><p>ร่วมพิมพ์หนังสือธรรมะ หรือช่วยแบ่งปันลิงก์ห้องสมุดและเสียงธรรมออนไลน์ให้ผู้อื่น</p><p class="muted">“การให้ธรรมะเป็นทาน ย่อมชนะการให้ทั้งปวง”</p></div>
+  </div>
+  <div class="notice" style="margin-top:34px;text-align:center">🙏 สอบถามเลขบัญชีและรายละเอียดการร่วมทำบุญได้ที่ <b><a href="tel:0853795589">085-379-5589</a></b> หรือ <b><a href="https://www.facebook.com/Watpamahachai/" target="_blank">เพจ Facebook วัดป่ามหาไชย</a></b><br><span style="font-size:.78rem">เพื่อความปลอดภัย โปรดตรวจสอบชื่อบัญชีให้เป็นของวัดทุกครั้งก่อนโอน</span></div>
+</section>
+
+<section id="visit" class="route-view">
+  <div style="max-width:1080px;margin:0 auto"><a class="back-home-link" href="#">‹ กลับหน้าแรก</a></div>
+  <div class="section-head">
+    <div class="eyebrow">ติดต่อ & การเดินทาง</div>
+    <h2>มาวัดป่ามหาไชย</h2>
+    <p>ยินดีต้อนรับทุกท่าน หากมาครั้งแรกแนะนำให้โทรสอบถามก่อนเดินทาง</p>
+  </div>
+  <div class="card-grid two">
+    <div class="map-wrap"><iframe loading="lazy" title="แผนที่วัดป่ามหาไชย" src="https://maps.google.com/maps?q=%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%9B%E0%B9%88%E0%B8%B2%E0%B8%A1%E0%B8%AB%E0%B8%B2%E0%B9%84%E0%B8%8A%E0%B8%A2%20%E0%B8%AA%E0%B8%A1%E0%B8%B8%E0%B8%97%E0%B8%A3%E0%B8%AA%E0%B8%B2%E0%B8%84%E0%B8%A3&z=14&output=embed"></iframe></div>
+    <div class="info-card">
+      <h3>📍 ข้อมูลติดต่อ</h3>
+      <ul class="contact-list">
+        <li><span class="ci">🏠</span><div><small>ที่อยู่</small><span class="v">50/3 หมู่ 7 ต.บ้านเกาะ อ.เมือง จ.สมุทรสาคร 74000</span></div></li>
+        <li><span class="ci">📞</span><div><small>โทรศัพท์</small><a href="tel:0853795589">085-379-5589</a></div></li>
+        <li><span class="ci">✉️</span><div><small>อีเมล</small><a href="mailto:mahachaiwatpa@gmail.com">mahachaiwatpa@gmail.com</a></div></li>
+        <li><span class="ci">💬</span><div><small>Facebook</small><a href="https://www.facebook.com/Watpamahachai/" target="_blank">เพจวัดป่ามหาไชย</a></div></li>
+      </ul>
+      <a class="btn solid" style="margin-top:22px" target="_blank" href="https://www.google.com/maps/search/?api=1&query=%E0%B8%A7%E0%B8%B1%E0%B8%94%E0%B8%9B%E0%B9%88%E0%B8%B2%E0%B8%A1%E0%B8%AB%E0%B8%B2%E0%B9%84%E0%B8%8A%E0%B8%A2%20%E0%B8%AA%E0%B8%A1%E0%B8%B8%E0%B8%97%E0%B8%A3%E0%B8%AA%E0%B8%B2%E0%B8%84%E0%B8%A3">นำทางด้วย Google Maps</a>
+    </div>
+  </div>
+  <div class="sub-head"><h3>คำแนะนำการเดินทาง</h3></div>
+  <div class="card-grid">
+    <div class="info-card"><h3>🚗 รถยนต์ส่วนตัว</h3><p>ค้นหา “วัดป่ามหาไชย สมุทรสาคร” ใน Google Maps แล้วกดนำทาง จากกรุงเทพฯ ใช้เส้นทางถนนพระราม ๒ มุ่งหน้าจังหวัดสมุทรสาคร</p></div>
+    <div class="info-card"><h3>🚌 รถโดยสารสาธารณะ</h3><p>เดินทางเข้าตัวเมืองสมุทรสาคร (มหาชัย) แล้วต่อรถรับจ้างหรือแท็กซี่ไปยังตำบลบ้านเกาะ แจ้งชื่อวัดกับคนขับ</p></div>
+    <div class="info-card"><h3>👋 มาครั้งแรก</h3><p>ติดต่อที่ศาลาหรือสำนักงานวัดเมื่อมาถึง แต่งกายสุภาพ และโทรแจ้งล่วงหน้าหากมาเป็นหมู่คณะ</p></div>
+  </div>
 </section>
 
 <div id="dynamicPagesContainer"></div>
@@ -649,6 +935,9 @@
       <h4>ช่องทางอื่น</h4>
       <a href="https://www.facebook.com/Watpamahachai/" target="_blank">Facebook เพจวัดป่ามหาไชย</a>
       <a href="https://nuan59.github.io/wat-mahachai-library/" target="_blank">ห้องสมุดธรรมะออนไลน์</a>
+      <a href="#schedule">ตารางกิจกรรม</a>
+      <a href="#donate">ร่วมทำบุญ</a>
+      <a href="#visit">แผนที่และการเดินทาง</a>
     </div>
   </div>
   <div class="footer-bottom">
@@ -672,17 +961,25 @@
 <script>
   /* ══════════════ Router: หน้าแรกคร่าวๆ + กดเมนูค่อยเห็นแต่ละหน้า ══════════════ */
   function applyRoute() {
-    const hash = location.hash.replace('#', '');
+    const hash = decodeURIComponent(location.hash.replace('#', ''));
     document.querySelectorAll('.route-view').forEach(el => el.classList.remove('active-route'));
+    let onSubPage = false;
     if (hash) {
       const target = document.getElementById(hash);
       if (target && target.classList.contains('route-view')) {
         target.classList.add('active-route');
+        onSubPage = true;
       }
     }
+    // หน้าย่อย: ซ่อน hero และภาพรวมหน้าแรก ให้เนื้อหาหน้านั้นอยู่บนสุด
+    document.querySelector('.hero').style.display = onSubPage ? 'none' : '';
+    document.getElementById('homeOverview').style.display = onSubPage ? 'none' : '';
+    document.querySelector('.divider').style.display = onSubPage ? 'none' : '';
+    if (hash === 'audio') { document.getElementById('audio').scrollIntoView(); return; }
     window.scrollTo({ top: 0 });
   }
   window.addEventListener('hashchange', applyRoute);
+  window.addEventListener('DOMContentLoaded', applyRoute);
 
   /* เมนูมือถือ */
   const navToggle = document.getElementById('navToggle');
@@ -692,7 +989,7 @@
 
   /* ปุ่มกลับขึ้นบน + scroll reveal + active nav */
   const toTopBtn = document.getElementById('toTop');
-  const revealEls = document.querySelectorAll('.section-head, .p-card, .about-grid, .library, .faq-list, .gallery-grid, .tabs');
+  const revealEls = document.querySelectorAll('.section-head, .p-card, .about-grid, .library, .faq-list, .gallery-grid, .tabs, .stat-strip, .intro-grid, .card-grid, .steps, .timeline, .holy-days, .precepts');
   revealEls.forEach(el => el.setAttribute('data-reveal', ''));
 
   const io = new IntersectionObserver((entries) => {
@@ -700,7 +997,7 @@
   }, { threshold: 0.12 });
   revealEls.forEach(el => io.observe(el));
 
-  const navSections = ['audio', 'about', 'practice', 'schedule', 'gallery', 'faq', 'contact'];
+  const navSections = ['audio', 'about', 'practice', 'schedule', 'gallery', 'faq', 'donate', 'visit', 'contact'];
   const navLinks = document.querySelectorAll('nav.links a');
   const navIo = new IntersectionObserver((entries) => {
     entries.forEach(e => {
@@ -749,6 +1046,51 @@
   }
   document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open'); });
 
+
+  /* ══════════════ เนื้อหาตั้งต้น (แสดงเมื่อยังไม่เชื่อม CMS หรือ CMS ยังไม่มีข้อมูล) ══════════════ */
+  const DEFAULT_SCHEDULE = [
+    { category: 'กิจวัตรประจำวัน', time: '04:00 น.', description: 'ตื่นนอน ทำวัตรเช้า สวดมนต์' },
+    { category: 'กิจวัตรประจำวัน', time: '05:00 น.', description: 'นั่งสมาธิ / เดินจงกรม' },
+    { category: 'กิจวัตรประจำวัน', time: '06:30 น.', description: 'พระภิกษุออกบิณฑบาต' },
+    { category: 'กิจวัตรประจำวัน', time: '07:30 น.', description: 'รับประทานอาหารเช้า ทำความสะอาดบริเวณวัด' },
+    { category: 'กิจวัตรประจำวัน', time: '09:00 น.', description: 'ฟังธรรมบรรยาย และปฏิบัติธรรม' },
+    { category: 'กิจวัตรประจำวัน', time: '11:00 น.', description: 'ถวายภัตตาหารเพล / รับประทานอาหาร' },
+    { category: 'กิจวัตรประจำวัน', time: '13:00 น.', description: 'ปฏิบัติธรรม เดินจงกรม-นั่งสมาธิ' },
+    { category: 'กิจวัตรประจำวัน', time: '18:00 น.', description: 'ทำวัตรเย็น สวดมนต์ ฟังธรรม' },
+    { category: 'กิจวัตรประจำวัน', time: '21:00 น.', description: 'พักผ่อนตามอัธยาศัย' },
+    { category: 'วันพระ', time: 'ช่วงเช้า', description: 'ทำบุญตักบาตร ถวายภัตตาหาร' },
+    { category: 'วันพระ', time: 'ช่วงสาย', description: 'รับศีล ฟังพระธรรมเทศนา' },
+    { category: 'วันพระ', time: 'ช่วงค่ำ', description: 'ทำวัตรเย็น สวดมนต์ และปฏิบัติธรรมร่วมกัน' },
+    { category: 'โครงการบวช', time: 'อุปสมบทหมู่', description: 'บวชระยะสั้น ศึกษาพระธรรมวินัย (สมัครด้วยตนเองที่วัด)' },
+    { category: 'โครงการบวช', time: 'บวชชีพราหมณ์', description: 'ถือศีล ๘ ปฏิบัติธรรม สำหรับสุภาพสตรี (สมัครด้วยตนเองที่วัด)' },
+    { category: 'โครงการบวช', time: 'กำหนดการ', description: 'ประกาศผ่านเพจ Facebook และโทรสอบถาม 085-379-5589' }
+  ];
+
+  const DEFAULT_FAQ = [
+    { question: 'มาปฏิบัติธรรมที่วัดต้องเสียค่าใช้จ่ายไหม?', answer: 'ไม่มีค่าใช้จ่าย ผู้มาปฏิบัติธรรมสามารถร่วมทำบุญตามกำลังศรัทธาได้ตามความสมัครใจ' },
+    { question: 'ไม่เคยนั่งสมาธิมาก่อน มาปฏิบัติได้ไหม?', answer: 'ได้ วัดยินดีต้อนรับผู้เริ่มต้น ในช่วงแรกจะมีการแนะนำวิธีสวดมนต์ เดินจงกรม และนั่งสมาธิเบื้องต้น ค่อย ๆ ฝึกตามกำลังของตนเอง' },
+    { question: 'ต้องสมัครล่วงหน้าหรือไม่?', answer: 'สำหรับโครงการอุปสมบทหมู่และบวชชีพราหมณ์ ต้องสมัครด้วยตนเองที่วัดพร้อมบัตรประชาชน ส่วนการมาปฏิบัติธรรมทั่วไป แนะนำให้โทรสอบถามก่อนที่ 085-379-5589' },
+    { question: 'ต้องเตรียมอะไรมาบ้าง?', answer: 'ชุดขาวสุภาพ ๒–๓ ชุด ของใช้ส่วนตัว ยาประจำตัว บัตรประชาชน และยากันยุง ดูรายการเต็มได้ที่หน้า “แนวทางปฏิบัติ”' },
+    { question: 'การแต่งกายมาวัดควรเป็นอย่างไร?', answer: 'ผู้มาปฏิบัติธรรมแต่งชุดขาว ผู้มาทำบุญทั่วไปแต่งกายสุภาพ งดเสื้อแขนกุด กางเกงขาสั้น และกระโปรงสั้น' },
+    { question: 'ใช้โทรศัพท์มือถือระหว่างปฏิบัติได้ไหม?', answer: 'ควรปิดเครื่องหรือฝากไว้ระหว่างปฏิบัติ เพื่อไม่ให้รบกวนตนเองและผู้อื่น สามารถใช้ติดต่อธุระจำเป็นได้ในเวลาพัก' },
+    { question: 'มาเป็นหมู่คณะหรือหน่วยงานได้หรือไม่?', answer: 'ได้ กรุณาติดต่อวัดล่วงหน้าเพื่อนัดหมายวันเวลาและจำนวนผู้เข้าร่วม' },
+    { question: 'อยู่ไกล ไม่สะดวกมาวัด ศึกษาธรรมได้อย่างไร?', answer: 'ฟังเสียงธรรมได้ที่หน้าแรกของเว็บไซต์ และอ่านหนังสือธรรมะฟรีที่ห้องสมุดธรรมะออนไลน์ รวมถึงติดตามข่าวสารทางเพจ Facebook ของวัด' }
+  ];
+
+  const HOLY_DAYS = [
+    { name: 'วันมาฆบูชา', lunar: 'ขึ้น ๑๕ ค่ำ เดือน ๓ (ราว ก.พ.–มี.ค.)', desc: 'วันจาตุรงคสันนิบาต พระพุทธเจ้าทรงแสดงโอวาทปาติโมกข์ ร่วมทำบุญ ฟังธรรม เวียนเทียน' },
+    { name: 'วันวิสาขบูชา', lunar: 'ขึ้น ๑๕ ค่ำ เดือน ๖ (ราว พ.ค.)', desc: 'วันประสูติ ตรัสรู้ และปรินิพพาน ร่วมปฏิบัติธรรมและเวียนเทียนรอบอุโบสถ' },
+    { name: 'วันอาสาฬหบูชา', lunar: 'ขึ้น ๑๕ ค่ำ เดือน ๘ (ราว ก.ค.)', desc: 'วันแสดงปฐมเทศนาและเกิดพระรัตนตรัยครบองค์สาม' },
+    { name: 'วันเข้าพรรษา', lunar: 'แรม ๑ ค่ำ เดือน ๘', desc: 'ถวายเทียนพรรษาและผ้าอาบน้ำฝน เริ่มต้นตั้งใจรักษาศีลตลอดพรรษา' },
+    { name: 'วันออกพรรษา', lunar: 'ขึ้น ๑๕ ค่ำ เดือน ๑๑ (ราว ต.ค.)', desc: 'วันมหาปวารณา ทำบุญตักบาตรเทโวโรหณะ' },
+    { name: 'ทอดกฐิน', lunar: 'หลังออกพรรษา ๑ เดือน', desc: 'ร่วมเป็นเจ้าภาพถวายผ้ากฐิน ติดตามกำหนดการทางเพจของวัด' }
+  ];
+
+  function renderHolyDays() {
+    const html = HOLY_DAYS.map(h => `<div class="holy"><b>${h.name}</b><span class="lunar">${h.lunar}</span><p>${h.desc}</p></div>`).join('');
+    ['homeHolyDays', 'scheduleHolyDays'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = html; });
+  }
+
   /* ══════════════ CMS: โหลด/แสดงเนื้อหาจาก Google Sheets ══════════════ */
   const CMS_API_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
   let cmsGallery = [], cmsSchedule = [], cmsFaq = [], cmsHistory = '', cmsAudio = [], cmsQuotes = [], cmsPages = [];
@@ -774,12 +1116,17 @@
   }
 
   async function loadCmsData() {
+    // แสดงเนื้อหาตั้งต้นก่อน แล้วค่อยแทนด้วยข้อมูลจาก CMS ถ้ามี
+    renderHolyDays();
+    cmsSchedule = DEFAULT_SCHEDULE; renderSchedule();
+    cmsFaq = DEFAULT_FAQ; renderFaq();
+    if (!CMS_API_URL || CMS_API_URL.startsWith('PASTE_')) { applyRoute(); return; }
     try {
       const res = await fetch(CMS_API_URL);
       const data = await res.json();
       cmsGallery = data.gallery || [];
-      cmsSchedule = data.schedule || [];
-      cmsFaq = data.faq || [];
+      cmsSchedule = (data.schedule && data.schedule.length) ? data.schedule : DEFAULT_SCHEDULE;
+      cmsFaq = (data.faq && data.faq.length) ? data.faq : DEFAULT_FAQ;
       cmsHistory = data.history || '';
       cmsAudio = data.audio || [];
       cmsQuotes = data.quotes || [];
