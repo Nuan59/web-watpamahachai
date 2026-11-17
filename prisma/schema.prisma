@@ -180,3 +180,15 @@ model Message {
 
   @@index([readAt])
 }
+
+/// Photos shown in the slideshow at the top of the home page.
+model HomeSlide {
+  id        String   @id @default(cuid())
+  imageKey  String
+  title     String   @default("")
+  caption   String   @default("")
+  linkUrl   String   @default("") // optional: /events, https://…
+  sort      Int      @default(0)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

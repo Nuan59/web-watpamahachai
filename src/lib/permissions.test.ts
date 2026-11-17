@@ -13,6 +13,11 @@ describe("permissions", () => {
     expect(can(u("ADMIN"), "settings", "view")).toBe(false);
     expect(can(u("ADMIN"), "users", "view")).toBe(false);
   });
+  it("editor manages home photos but cannot delete them", () => {
+    expect(can(u("EDITOR"), "home", "create")).toBe(true);
+    expect(can(u("EDITOR"), "home", "delete")).toBe(false);
+    expect(can(u("ADMIN"), "home", "delete")).toBe(true);
+  });
   it("editor deletes nothing and does not see sign-ups", () => {
     expect(can(u("EDITOR"), "news", "edit")).toBe(true);
     expect(can(u("EDITOR"), "news", "delete")).toBe(false);

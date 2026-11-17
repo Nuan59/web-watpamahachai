@@ -3,6 +3,9 @@
 import { PrismaClient } from "@prisma/client";
 import { hashPassword } from "../src/lib/session";
 import { day, isoDay } from "../src/lib/dates";
+import { copyFileSync, mkdirSync } from "node:fs";
+import path from "node:path";
+import { keyToPath } from "../src/lib/storage";
 
 const prisma = new PrismaClient();
 const PW = process.env.SEED_PASSWORD || "mahachai1234";
@@ -11,7 +14,7 @@ const plus = (n: number) => day(isoDay(new Date(Date.now() + n * 86400000)));
 async function main() {
   if ((await prisma.user.count()) > 0) {
     if (process.env.SEED_RESET !== "1") throw new Error("Database already has accounts. Run with SEED_RESET=1 to wipe and reseed.");
-    for (const m of ["activityLog", "registration", "event", "post", "photo", "album", "audioTrack", "quote", "faq", "page", "message", "scheduleItem", "setting", "user"] as const) {
+    for (const m of ["activityLog", "registration", "event", "post", "photo", "album", "audioTrack", "quote", "faq", "page", "message", "scheduleItem", "setting", "homeSlide", "user"] as const) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (prisma[m] as any).deleteMany();
     }
@@ -23,7 +26,7 @@ async function main() {
 
   const schedule: [string, string, string][] = [
     ["กิจวัตรประจำวัน", "04:00 น.", "ตื่นนอน ทำวัตรเช้า สวดมนต์"], ["กิจวัตรประจำวัน", "05:00 น.", "นั่งสมาธิ / เดินจงกรม"],
-    ["กิจวัตรประจำวัน", "06:30 น.", "พระภิกษุออกบิณฑบาต"], ["กิจวัตรประจำวัน", "07:30 น.", "รับประทานอาหารเช้า ทำความสะอาดบริเวณวัด"],
+    ["กิจวัตรประจำวัน", "06:15–07:15 น.", "ออกรับบิณฑบาต (วันพฤหัสบดีออกรับบิณฑบาตที่ตลาดมหาชัย)"], ["กิจวัตรประจำวัน", "07:30 น.", "รับประทานอาหารเช้า ทำความสะอาดบริเวณวัด"],
     ["กิจวัตรประจำวัน", "09:00 น.", "ฟังธรรมบรรยาย และปฏิบัติธรรม"], ["กิจวัตรประจำวัน", "11:00 น.", "ถวายภัตตาหารเพล / รับประทานอาหาร"],
     ["กิจวัตรประจำวัน", "13:00 น.", "ปฏิบัติธรรม เดินจงกรม-นั่งสมาธิ"], ["กิจวัตรประจำวัน", "18:00 น.", "ทำวัตรเย็น สวดมนต์ ฟังธรรม"],
     ["กิจวัตรประจำวัน", "21:00 น.", "พักผ่อนตามอัธยาศัย"],
@@ -67,6 +70,19 @@ async function main() {
       body: "วัดป่ามหาไชยเปิดเว็บไซต์ใหม่ เพื่อให้ญาติโยมติดตามข่าวสารของวัดได้สะดวกขึ้น\n\n## ทำอะไรได้บ้าง\n\n- ดู [กิจกรรมที่จะมาถึง](/events) และลงทะเบียนออนไลน์สำหรับรอบที่เปิดรับ\n- ฟัง [เสียงธรรม](/dhamma) ได้ทุกที่\n- ดู [ตารางกิจวัตร](/schedule) และ [แนวทางการปฏิบัติธรรม](/practice)\n- [ส่งข้อความถึงวัด](/contact) เมื่อมีคำถาม\n\nอนุโมทนาบุญทุกท่าน",
     },
   });
+  // Home slideshow: photos from the temple's current website (watpamahachai.org).
+  const slides: [string, string, string, string][] = [
+    ["alms-round.webp", "ออกรับบิณฑบาตโปรดญาติโยมทุกวัน", "เวลา ๐๖.๑๕–๐๗.๑๕ น. (วันพฤหัสบดีออกรับบิณฑบาตที่ตลาดมหาชัย)", "/schedule"],
+    ["temple.webp", "วัดป่ามหาไชย", "สำนักปฏิบัติธรรมประจำจังหวัดสมุทรสาคร (ธรรมยุต) แห่งที่ ๑", "/about"],
+    ["dhamma-talk.webp", "ฟังธรรม ปฏิบัติธรรม", "ศึกษาธรรม นำปฏิบัติ พัฒนาจิต คิดค้นทางพ้นทุกข์", "/practice"],
+  ];
+  for (const [n, [file, title, caption, linkUrl]] of slides.entries()) {
+    const key = `public/home/seed-${file}`;
+    mkdirSync(path.dirname(keyToPath(key)), { recursive: true });
+    copyFileSync(path.join(__dirname, "seed-images", file), keyToPath(key));
+    await prisma.homeSlide.create({ data: { imageKey: key, title, caption, linkUrl, sort: n } });
+  }
+
   console.log(`Seeded. Logins (password "${PW}"): owner@ / office@ / editor@watpamahachai.test`);
 }
 

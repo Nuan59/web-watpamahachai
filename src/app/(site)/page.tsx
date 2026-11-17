@@ -7,6 +7,8 @@ import { thDate } from "@/lib/dates";
 import { fileUrl } from "@/lib/storage";
 import { HOLY_DAYS } from "@/lib/holy-days";
 import { AudioPlayer } from "@/components/audio-player";
+import { HeroSlides } from "@/components/hero-slides";
+import { homeSlides, latestPhotos } from "@/lib/slides";
 import { Empty, EventCard, SectionHead } from "@/components/site-ui";
 
 const START = [
@@ -19,16 +21,17 @@ const START = [
 ];
 
 export default async function Home() {
-  const [s, events, tracks, quote, posts] = await Promise.all([getSettings(), upcomingEvents(4), playlist(), latestQuote(), publishedPosts(3)]);
+  const [s, events, tracks, quote, posts, slides, photos] = await Promise.all([getSettings(), upcomingEvents(4), playlist(), latestQuote(), publishedPosts(3), homeSlides(), latestPhotos(8)]);
   const q = quote ?? { text: s.motto, author: s.mottoBy };
   return (
     <>
+      <HeroSlides slides={slides} />
       <section className="hero-bg border-b border-line">
         <div className="wrap grid items-center gap-10 py-14 sm:py-20 lg:grid-cols-[1.1fr_.9fr]">
           <div className="text-center lg:text-left">
-            <Image src="/logo.webp" alt="ตราวัดป่ามหาไชย" width={150} height={150} priority className="mx-auto mb-6 rounded-full bg-white shadow-[0_8px_30px_rgba(116,74,36,.15)] lg:mx-0" />
+            <Image src="/logo.webp" alt="ตราวัดป่ามหาไชย" width={slides.length ? 96 : 150} height={slides.length ? 96 : 150} priority={!slides.length} className="mx-auto mb-6 rounded-full bg-white shadow-[0_8px_30px_rgba(116,74,36,.15)] lg:mx-0" />
             <p className="eyebrow">{s.tagline}</p>
-            <h1 className="mt-3 text-4xl leading-tight sm:text-5xl">ศึกษาธรรม <span className="text-brown">ปฏิบัติธรรม</span><br />เผยแพร่ธรรม</h1>
+            <h1 className="mt-3 text-4xl leading-tight sm:text-5xl"><span className="whitespace-nowrap">ศึกษาธรรม</span> <span className="whitespace-nowrap text-brown">ปฏิบัติธรรม</span><br /><span className="whitespace-nowrap">เผยแพร่ธรรม</span></h1>
             <blockquote className="mt-6 font-display text-lg text-muted">“{q.text}”<footer className="mt-1 font-sans text-sm text-grey">— {q.author || "โอวาทธรรม"}</footer></blockquote>
             <div className="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
               <Link href="/practice" className="btn btn-primary">แนวทางปฏิบัติธรรม</Link>
@@ -100,6 +103,23 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {photos.length > 0 && (
+        <section className="wrap py-16">
+          <SectionHead eyebrow="บันทึกภาพ" title="ภาพกิจกรรมล่าสุด" />
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {photos.map((p, k) => (
+              <li key={p.id} className={k === 0 ? "col-span-2 row-span-2" : ""}>
+                <Link href={p.href} className="group relative block aspect-square overflow-hidden rounded-lg border border-line bg-cream">
+                  <Image src={p.src} alt={p.caption} fill sizes={k === 0 ? "(min-width:640px) 50vw, 100vw" : "(min-width:640px) 25vw, 50vw"} className="object-cover transition group-hover:scale-105" />
+                  <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2 pt-8 text-xs text-white opacity-0 transition group-hover:opacity-100 sm:text-sm">{p.caption}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-center"><Link href="/gallery" className="btn">ดูคลังภาพทั้งหมด</Link></p>
+        </section>
+      )}
 
       {posts.length > 0 && (
         <section className="wrap py-16">

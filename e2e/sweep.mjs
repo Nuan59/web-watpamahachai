@@ -12,7 +12,7 @@ const ok = (name, cond, extra = "") => { results.push({ name, pass: !!cond, extr
 mkdirSync("e2e/out", { recursive: true });
 
 const PUBLIC = ["/", "/about", "/practice", "/schedule", "/events", "/news", "/dhamma", "/gallery", "/faq", "/donate", "/contact", "/news/เว็บไซต์ใหม่ของวัด", "/events/ปฏิบัติธรรมวันหยุด-ตัวอย่าง", "/sitemap.xml", "/robots.txt"];
-const ADMIN = ["/admin", "/admin/news", "/admin/news/new", "/admin/events", "/admin/events/new", "/admin/registrations", "/admin/schedule", "/admin/dhamma", "/admin/gallery", "/admin/faq", "/admin/pages", "/admin/pages/new", "/admin/messages", "/admin/settings", "/admin/users", "/admin/users/new", "/admin/activity", "/admin/account"];
+const ADMIN = ["/admin", "/admin/home", "/admin/news", "/admin/news/new", "/admin/events", "/admin/events/new", "/admin/registrations", "/admin/schedule", "/admin/dhamma", "/admin/gallery", "/admin/faq", "/admin/pages", "/admin/pages/new", "/admin/messages", "/admin/settings", "/admin/users", "/admin/users/new", "/admin/activity", "/admin/account"];
 
 async function visit(page, path, width) {
   const errors = [];
@@ -131,6 +131,32 @@ try {
     await visitor.click("ul button >> nth=0");
     ok("public album opens the lightbox", await visitor.locator('[role="dialog"]').count());
     await visitor.keyboard.press("Escape");
+
+    // Home slideshow: seeded photos show, a new upload joins them, hiding one removes it
+    await visitor.goto(`${BASE}/`);
+    const before = await visitor.locator('[aria-roledescription="slide"]').count();
+    ok("home page shows the photo slideshow", before >= 3, `${before} slides`);
+    await admin.goto(`${BASE}/admin/home`);
+    await admin.setInputFiles('input[name="images"]', "public/og.jpg");
+    await admin.fill('form:has(input[name="images"]) input[name="title"]', "ภาพทดสอบหน้าแรก");
+    await admin.fill('form:has(input[name="images"]) input[name="linkUrl"]', "javascript:alert(1)");
+    await admin.click('button:has-text("เพิ่มภาพ")');
+    ok("unsafe slide link is refused", await admin.locator('[role="alert"]', { hasText: "ลิงก์ต้องขึ้นต้นด้วย" }).waitFor().then(() => true, () => false));
+    await admin.setInputFiles('input[name="images"]', "public/og.jpg");
+    await admin.fill('form:has(input[name="images"]) input[name="title"]', "ภาพทดสอบหน้าแรก");
+    await admin.fill('form:has(input[name="images"]) input[name="linkUrl"]', "/events");
+    await admin.click('button:has-text("เพิ่มภาพ")');
+    await admin.locator("text=เพิ่ม 1 ภาพแล้ว").waitFor();
+    await visitor.goto(`${BASE}/`);
+    ok("new slide appears on the home page", (await visitor.locator('[aria-roledescription="slide"]').count()) === before + 1 && (await visitor.locator('text=ภาพทดสอบหน้าแรก').count()) === 1);
+    await visitor.click('button[aria-label="ไปที่ภาพที่ 2"]');
+    ok("slideshow dots move to the chosen photo", (await visitor.locator('[aria-roledescription="slide"][aria-hidden="false"]').getAttribute("aria-label")) === `ภาพที่ 2 จาก ${before + 1}`);
+    const card = admin.locator("form", { has: admin.locator('input[value="ภาพทดสอบหน้าแรก"]') });
+    await card.locator('input[name="active"]').uncheck();
+    await Promise.all([admin.waitForURL(/ok=/), card.locator('button:has-text("บันทึก")').click()]);
+    await visitor.goto(`${BASE}/`);
+    ok("hidden slide is gone from the home page", (await visitor.locator('text=ภาพทดสอบหน้าแรก').count()) === 0);
+    ok("home shows the latest gallery photos", (await visitor.locator('section:has-text("ภาพกิจกรรมล่าสุด") a[href^="/gallery/"]').count()) >= 2);
 
     // Audio: upload a small mp3-typed file and see it in the public playlist
     await admin.goto(`${BASE}/admin/dhamma`);

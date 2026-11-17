@@ -13,7 +13,7 @@ async function logout() {
   redirect("/admin/login");
 }
 
-const CONTENT: Module[] = ["news", "events", "schedule", "dhamma", "gallery", "faq", "pages"];
+const CONTENT: Module[] = ["home", "news", "events", "schedule", "dhamma", "gallery", "faq", "pages"];
 const OFFICE: Module[] = ["registrations", "messages"];
 const SYSTEM: Module[] = ["settings", "users"];
 
