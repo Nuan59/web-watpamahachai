@@ -13,7 +13,7 @@ export default async function PagesAdmin({ searchParams }: { searchParams: SP })
     <>
       <Head title="หน้าเนื้อหา" actions={can(u, "pages", "create") && <Link href="/admin/pages/new" className="btn btn-primary btn-sm">+ สร้างหน้า</Link>} />
       <Flash sp={await searchParams} />
-      <p className="mb-4 hint">หน้าเพิ่มเติม เช่น ประวัติหลวงพ่อ ระเบียบการบวช หรือโครงการพิเศษ เลือกได้ว่าจะให้อยู่ใต้เมนูไหน</p>
+      <p className="mb-4 hint">หน้าเนื้อหาของเมนูต่าง ๆ เช่น ประวัติเจ้าอาวาส อุปสมบทหมู่ ด้านการศึกษา — หน้าที่เป็น “ฉบับร่าง” ยังไม่ขึ้นบนเว็บ ใส่เนื้อหาแล้วติ๊ก “แสดงบนเว็บไซต์”</p>
       <Panel>
         {pages.length ? (
           <TableWrap>
@@ -23,7 +23,7 @@ export default async function PagesAdmin({ searchParams }: { searchParams: SP })
                 <tr key={p.id}>
                   <td><Link href={`/admin/pages/${p.id}`} className="font-medium underline-offset-2 hover:underline">{p.title}</Link></td>
                   <td className="text-muted">/p/{p.slug}</td><td>{p.navGroup || "—"}</td>
-                  <td>{p.published ? <Pill tone="ok">แสดง</Pill> : <Pill>ซ่อน</Pill>}</td>
+                  <td>{p.published ? <Pill tone="ok">แสดง</Pill> : <Pill tone="warn">ฉบับร่าง</Pill>}</td>
                 </tr>
               ))}</tbody>
             </table>

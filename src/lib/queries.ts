@@ -2,12 +2,20 @@ import { prisma } from "./db";
 import { audioSrc } from "./text";
 import type { Track } from "@/components/audio-player";
 
-/** Playable tracks, featured first. Tracks with no usable source are left out. */
-export async function playlist(): Promise<Track[]> {
-  const rows = await prisma.audioTrack.findMany({ orderBy: [{ featured: "desc" }, { sort: "asc" }, { createdAt: "desc" }] });
+/**
+ * Playable tracks. Default: every track, featured first (home page player). With seriesId: one series
+ * (null = tracks in no series). Tracks with no usable source are left out; hidden series are skipped.
+ */
+export async function playlist(opts: { seriesId?: string | null; inSeriesOrder?: boolean } = {}): Promise<Track[]> {
+  const rows = await prisma.audioTrack.findMany({
+    where: opts.seriesId !== undefined ? { seriesId: opts.seriesId } : { OR: [{ seriesId: null }, { series: { published: true } }] },
+    orderBy: opts.inSeriesOrder ? [{ sort: "asc" }, { createdAt: "asc" }] : [{ featured: "desc" }, { sort: "asc" }, { createdAt: "desc" }],
+  });
   return rows.flatMap((r) => {
     const src = audioSrc(r);
-    return src ? [{ id: r.id, title: r.title, speaker: r.speaker, category: r.category, src }] : [];
+    if (!src) return [];
+    const download = !r.downloadable ? null : r.fileKey ? `/files/${r.fileKey}?dl=${encodeURIComponent(r.title)}` : src;
+    return [{ id: r.id, title: r.title, speaker: r.speaker, category: r.category, src, download }];
   });
 }
 

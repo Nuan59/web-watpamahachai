@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-export type Track = { id: string; title: string; speaker: string; category: string; src: string };
+export type Track = { id: string; title: string; speaker: string; category: string; src: string; download?: string | null };
 
 const fmt = (s: number) => (isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
 
 /** Plays the list one after another, like a radio. */
-export function AudioPlayer({ tracks, compact = false }: { tracks: Track[]; compact?: boolean }) {
+export function AudioPlayer({ tracks, compact = false, showDownloads = false }: { tracks: Track[]; compact?: boolean; showDownloads?: boolean }) {
   const ref = useRef<HTMLAudioElement>(null);
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -60,19 +60,22 @@ export function AudioPlayer({ tracks, compact = false }: { tracks: Track[]; comp
         <button type="button" onClick={() => go(i + 1)} aria-label="เรื่องถัดไป" className="btn btn-sm hidden sm:inline-flex">ถัดไป ⏭</button>
       </div>
       {failed && <p className="mt-2 text-sm text-bad">เปิดไฟล์เสียงนี้ไม่ได้ ลองเรื่องถัดไป</p>}
-      {tracks.length > 1 && (
+      {(tracks.length > 1 || showDownloads) && (
         <>
           <button type="button" onClick={() => setShowList((v) => !v)} aria-expanded={showList} className="mt-3 w-full cursor-pointer text-center text-sm text-muted hover:text-brown">
             {showList ? "ซ่อนรายการ ▴" : `เลือกฟังเรื่องอื่น (${tracks.length} เรื่อง) ▾`}
           </button>
           {showList && (
-            <ol className="mt-2 max-h-72 overflow-y-auto border-t border-cream pt-2">
+            <ol className={`mt-2 overflow-y-auto border-t border-cream pt-2 ${showDownloads ? "" : "max-h-72"}`}>
               {tracks.map((x, n) => (
-                <li key={x.id}>
+                <li key={x.id} className="flex items-center gap-1">
                   <button type="button" onClick={() => go(n)} aria-current={n === i ? "true" : undefined} className="flex w-full cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-left text-sm hover:bg-cream aria-[current=true]:bg-brown-tint aria-[current=true]:text-brown-dark">
                     <span className="w-5 text-grey num">{n + 1}</span>
                     <span className="min-w-0 flex-1"><span className="block truncate">{x.title}</span><span className="text-xs text-grey">{x.category}{x.speaker && ` · ${x.speaker}`}</span></span>
                   </button>
+                  {showDownloads && x.download && (
+                    <a href={x.download} aria-label={`ดาวน์โหลด ${x.title}`} title="ดาวน์โหลด" className="grid h-10 w-10 shrink-0 place-items-center rounded-md text-brown hover:bg-cream" {...(x.download.startsWith("/") ? {} : { target: "_blank", rel: "noopener" })}>⬇</a>
+                  )}
                 </li>
               ))}
             </ol>

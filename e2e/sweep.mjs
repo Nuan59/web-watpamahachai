@@ -11,8 +11,8 @@ const results = [];
 const ok = (name, cond, extra = "") => { results.push({ name, pass: !!cond, extra }); console.log(`${cond ? "✓" : "✗"} ${name}${extra ? ` — ${extra}` : ""}`); };
 mkdirSync("e2e/out", { recursive: true });
 
-const PUBLIC = ["/", "/about", "/practice", "/schedule", "/events", "/news", "/dhamma", "/gallery", "/faq", "/donate", "/contact", "/news/เว็บไซต์ใหม่ของวัด", "/events/ปฏิบัติธรรมวันหยุด-ตัวอย่าง", "/sitemap.xml", "/robots.txt"];
-const ADMIN = ["/admin", "/admin/home", "/admin/news", "/admin/news/new", "/admin/events", "/admin/events/new", "/admin/registrations", "/admin/schedule", "/admin/dhamma", "/admin/gallery", "/admin/faq", "/admin/pages", "/admin/pages/new", "/admin/messages", "/admin/settings", "/admin/users", "/admin/users/new", "/admin/activity", "/admin/account"];
+const PUBLIC = ["/", "/about", "/practice", "/schedule", "/events", "/news", "/dhamma", "/gallery", "/faq", "/donate", "/contact", "/library", "/monks", "/videos", "/news/เว็บไซต์ใหม่ของวัด", "/events/ปฏิบัติธรรมวันหยุด-ตัวอย่าง", "/sitemap.xml", "/robots.txt"];
+const ADMIN = ["/admin", "/admin/home", "/admin/library", "/admin/monks", "/admin/news", "/admin/news/new", "/admin/events", "/admin/events/new", "/admin/registrations", "/admin/schedule", "/admin/dhamma", "/admin/gallery", "/admin/faq", "/admin/pages", "/admin/pages/new", "/admin/messages", "/admin/settings", "/admin/users", "/admin/users/new", "/admin/activity", "/admin/account"];
 
 async function visit(page, path, width) {
   const errors = [];
@@ -79,7 +79,8 @@ try {
     await visitor.fill('input[name="phone"]', "08x");
     await visitor.click('button:has-text("ลงทะเบียน")');
     await visitor.waitForSelector('[role="alert"]');
-    ok("bad phone shows a clear error", (await visitor.textContent('[role="alert"]')).includes("เบอร์โทรไม่ถูกต้อง"));
+    const alertText = await visitor.locator('form [role="alert"]').textContent().catch(() => "none");
+    ok("bad phone shows a clear error", alertText.includes("เบอร์โทรไม่ถูกต้อง"), alertText);
     ok("the name typed before the error is kept", (await visitor.inputValue('input[name="name"]')) === "ผู้ทดสอบ หนึ่ง");
     await visitor.fill('input[name="phone"]', "081-234-5678");
     await visitor.fill('input[name="people"]', "2");
@@ -169,6 +170,71 @@ try {
     const range = await visitor.request.get(`${BASE}${await admin.locator("audio").first().getAttribute("src")}`, { headers: { range: "bytes=0-1" } });
     ok("audio file answers Range requests", range.status() === 206);
 
+    // Upgrades that bring back the old website's features
+    {
+      // Audio series: publish a seeded series, upload two talks, download one
+      await admin.goto(`${BASE}/admin/dhamma`);
+      await admin.click('a:has-text("ธรรมกำไรชีวิต")');
+      await admin.waitForURL(/\/admin\/dhamma\/[^/]+$/);
+      // Playwright can't read Thai file paths, so the files are handed over from memory with their Thai names.
+      await admin.setInputFiles('input[name="files"]', [
+        { name: "ตอนที่ 02 วจีทุจริต.mp3", mimeType: "audio/mpeg", buffer: Buffer.from("ID3b") },
+        { name: "ตอนที่ 01 กายทุจริต.mp3", mimeType: "audio/mpeg", buffer: Buffer.from("ID3a") },
+      ]);
+      await admin.click('button:has-text("อัปโหลด")');
+      await admin.waitForURL(/[?&](ok|error)=/);
+      ok("series upload accepted", await admin.locator("text=เพิ่ม 2 ไฟล์แล้ว").waitFor().then(() => true, () => false));
+      ok("series upload names talks from file names, in order", (await admin.locator("ol > li p.font-medium").allTextContents()).join("|").replace(/\s+/g, " ").includes("1. ตอนที่ 01 กายทุจริต|2. ตอนที่ 02 วจีทุจริต"));
+      await admin.check('input[name="published"]');
+      await Promise.all([admin.waitForURL(/ok=/), admin.click('form:has(input[name="zipUrl"]) button:has-text("บันทึก")')]);
+      const sslug = await admin.inputValue('input[name="slug"]');
+      await visitor.goto(`${BASE}/dhamma/${encodeURIComponent(sslug)}`);
+      ok("published series page lists its talks", (await visitor.locator("text=ตอนที่ 01 กายทุจริต").count()) >= 1);
+      const dl = await visitor.locator('a[aria-label^="ดาวน์โหลด ตอนที่ 01"]').getAttribute("href");
+      const dres = await visitor.request.get(BASE + dl);
+      ok("talk downloads as an attachment with its Thai title", dres.status() === 200 && (dres.headers()["content-disposition"] ?? "").includes(encodeURIComponent("ตอนที่ 01 กายทุจริต.mp3")));
+      await visitor.goto(`${BASE}/`);
+      ok("series shows in the เสียงธรรม menu and on the home page", (await visitor.locator(`a[href="/dhamma/${sslug}"]`).count()) >= 2);
+
+      // Library: PDF to read and download
+      await admin.goto(`${BASE}/admin/library`);
+      await admin.setInputFiles('input[name="files"]', { name: "บทสวดมนต์ทำวัตร.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.4\n%%EOF\n") });
+      await Promise.all([admin.waitForURL(/ok=/), admin.click('button:has-text("เพิ่ม")')]);
+      await visitor.goto(`${BASE}/library?cat=${encodeURIComponent("หนังสือสวดมนต์")}`);
+      ok("library lists the book under its category", (await visitor.locator("h3", { hasText: "บทสวดมนต์ทำวัตร" }).count()) === 1);
+      const read = await visitor.request.get(BASE + (await visitor.locator('a:has-text("อ่าน")').first().getAttribute("href")));
+      ok("PDF opens for reading", read.headers()["content-type"] === "application/pdf" && !read.headers()["content-disposition"]);
+      ok("ห้องสมุด menu has the category", (await visitor.locator(`a[href="/library?cat=${encodeURIComponent("หนังสือสวดมนต์")}"]`).count()) >= 1);
+
+      // Monks
+      await admin.goto(`${BASE}/admin/monks`);
+      await admin.fill('input[name="name"]', "พระทดสอบ ฐิตธมฺโม");
+      await admin.fill('input[name="position"]', "พระลูกวัด");
+      await admin.setInputFiles('input[name="photo"]', "public/apple-icon.png");
+      await Promise.all([admin.waitForURL(/ok=/), admin.click('button:has-text("เพิ่ม")')]);
+      await visitor.goto(`${BASE}/monks`);
+      ok("monk list shows the new monk with a photo", (await visitor.locator("text=พระทดสอบ ฐิตธมฺโม").count()) === 1 && (await visitor.locator('img[alt="พระทดสอบ ฐิตธมฺโม"]').count()) === 1);
+      ok("พระในสังกัด appears in the ประวัติ menu", (await visitor.locator('a[href="/monks"]').count()) >= 1);
+
+      // A drafted old-menu page appears once published
+      await admin.goto(`${BASE}/admin/pages`);
+      await admin.click('a:has-text("อุปสมบทหมู่")');
+      await admin.waitForURL(/\/admin\/pages\/[^/]+$/);
+      await visitor.goto(`${BASE}/`);
+      const pslug = await admin.inputValue('input[name="slug"]');
+      ok("draft page is not in the menu", (await visitor.locator(`a[href="/p/${pslug}"]`).count()) === 0);
+      // inline picture upload in the editor
+      await admin.setInputFiles('input[aria-label="เลือกรูปที่จะแทรก"]', "public/og.jpg");
+      await admin.waitForFunction(() => document.querySelector('textarea[name="body"]').value.includes("/files/public/content/"));
+      ok("editor inserts an uploaded picture into the text", true);
+      await admin.check('input[name="published"]');
+      await admin.click('button:has-text("บันทึก")');
+      await admin.waitForURL(/ok=/);
+      await visitor.goto(`${BASE}/p/${encodeURIComponent(pslug)}`);
+      ok("published page shows the inserted picture", (await visitor.locator('.prose-wat img[src^="/files/public/content/"]').count()) === 1);
+      ok("published page appears in the ปฏิบัติธรรม menu", (await visitor.locator(`a[href="/p/${pslug}"]`).count()) >= 1);
+    }
+
     // Settings: fill bank info → donate page shows it
     await ctx.clearCookies();
     await login(admin, "owner");
@@ -179,7 +245,25 @@ try {
     await Promise.all([admin.waitForURL(/ok=/), admin.click('button:has-text("บันทึกข้อมูลวัด")')]);
     await visitor.goto(`${BASE}/donate`);
     ok("donate page shows the saved account", await visitor.locator("text=000-0-00000-0").count());
-    for (const k of ["bankName", "bankAccount", "bankAccountName"]) await admin.fill(`input[name="${k}"]`, "");
+    // Radio and videos from the settings page
+    await admin.goto(`${BASE}/admin/settings`);
+    await admin.fill('input[name="radioUrl"]', "https://radio.invalid/live.mp3");
+    await admin.fill('textarea[name="videos"]', "https://youtu.be/dQw4w9WgXcQ");
+    await Promise.all([admin.waitForURL(/ok=/), admin.click('button:has-text("บันทึกข้อมูลวัด")')]);
+    await visitor.goto(`${BASE}/`);
+    ok("home shows the latest video", (await visitor.locator('iframe[src*="youtube-nocookie.com/embed/dQw4w9WgXcQ"]').count()) === 1);
+    await visitor.click('button[aria-label="ฟังวิทยุ"]');
+    ok("radio that cannot connect says it is off air", await visitor.locator("text=ขณะนี้ไม่ได้ออกอากาศ").waitFor({ timeout: 15000 }).then(() => true, () => false));
+    ok("YouTube link in the top bar", (await visitor.locator('a[aria-label="YouTube ของวัด"]').count()) === 1);
+    await visitor.goto(`${BASE}/videos`);
+    ok("videos page embeds the clip", (await visitor.locator("iframe").count()) === 1);
+    await admin.goto(`${BASE}/admin/settings`);
+    await admin.fill('input[name="radioUrl"]', "http://plain.invalid/live.mp3");
+    await Promise.all([admin.waitForURL(/error=/), admin.click('button:has-text("บันทึกข้อมูลวัด")')]);
+    ok("radio link without https is refused", await admin.locator('[role="alert"]').count());
+    await admin.goto(`${BASE}/admin/settings`);
+    for (const k of ["bankName", "bankAccount", "bankAccountName", "radioUrl"]) await admin.fill(`input[name="${k}"]`, "");
+    await admin.fill('textarea[name="videos"]', "");
     await Promise.all([admin.waitForURL(/ok=/), admin.click('button:has-text("บันทึกข้อมูลวัด")')]);
     await ctx.close();
   }

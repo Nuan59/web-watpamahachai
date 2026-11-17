@@ -23,7 +23,7 @@ export function EventForm({ e }: { e?: Ev }) {
           <Field label="วันสิ้นสุด" hint="กิจกรรมวันเดียว เว้นว่างได้"><input name="endDate" type="date" defaultValue={e ? isoDay(e.endDate) : undefined} className="input" /></Field>
           <Field label="สถานที่" hint="เว้นว่าง = ที่วัด" className="sm:col-span-2"><input name="location" defaultValue={e?.location} className="input" /></Field>
           <Field label="สรุปสั้น ๆ" className="sm:col-span-2"><textarea name="summary" rows={2} defaultValue={e?.summary} className="input" /></Field>
-          <div className="sm:col-span-2"><MdEditor name="body" defaultValue={e?.body} label="รายละเอียด / กำหนดการ" /></div>
+          <div className="sm:col-span-2"><MdEditor name="body" defaultValue={e?.body} label="รายละเอียด / กำหนดการ" imagesFor="events" /></div>
         </div>
       </Panel>
       <div className="space-y-5">

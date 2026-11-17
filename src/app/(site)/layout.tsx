@@ -2,11 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import "../globals.css";
-import { prisma } from "@/lib/db";
-import { getSettings } from "@/lib/settings";
 import { SITE_URL } from "@/lib/site";
 import { siteNav } from "@/lib/nav";
+import { navData } from "@/lib/site-data";
 import { DesktopNav, MobileNav } from "@/components/site-nav";
+import { FacebookIcon, YoutubeIcon } from "@/components/icons";
 
 // Content changes from the back office show up on the next page load.
 export const dynamic = "force-dynamic";
@@ -20,15 +20,24 @@ export const metadata: Metadata = {
 };
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [s, pages] = await Promise.all([
-    getSettings(),
-    prisma.page.findMany({ where: { published: true, navGroup: { not: "" } }, orderBy: [{ sort: "asc" }, { title: "asc" }], select: { slug: true, title: true, navGroup: true } }),
-  ]);
-  const nav = siteNav(pages);
+  const data = await navData();
+  const s = data.settings;
+  const nav = siteNav(data);
+  const tel = s.phone.replace(/\D/g, "");
   return (
     <html lang="th">
       <body className="flex min-h-dvh flex-col">
         <a href="#main" className="skip-link">ข้ามไปที่เนื้อหา</a>
+        <div className="bg-brown-dark text-white/90">
+          <div className="wrap flex min-h-9 items-center justify-between gap-3 text-xs sm:text-sm">
+            <p className="truncate">{s.tagline}</p>
+            <div className="flex shrink-0 items-center gap-1">
+              <a href={`tel:${tel}`} className="hidden px-2 py-1 hover:text-white sm:inline">โทร {s.phone}</a>
+              <a href={s.facebook} target="_blank" rel="noopener" aria-label="Facebook ของวัด" className="grid h-8 w-8 place-items-center rounded hover:bg-white/10"><FacebookIcon /></a>
+              {s.youtube && <a href={s.youtube} target="_blank" rel="noopener" aria-label="YouTube ของวัด" className="grid h-8 w-8 place-items-center rounded hover:bg-white/10"><YoutubeIcon /></a>}
+            </div>
+          </div>
+        </div>
         <header className="sticky top-0 z-30 border-b border-line bg-paper/95 backdrop-blur-sm">
           <div className="wrap flex items-center gap-4 py-2">
             <Link href="/" className="flex items-center gap-2.5">
@@ -38,9 +47,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             <nav aria-label="เมนูหลัก" className="ml-auto">
               <DesktopNav items={nav} />
             </nav>
-            <a href={s.libraryUrl} target="_blank" rel="noopener" className="btn btn-primary btn-sm hidden xl:inline-flex">ห้องสมุดธรรมะ</a>
             <div className="ml-auto lg:hidden">
-              <MobileNav items={[...nav, { href: s.libraryUrl, label: "ห้องสมุดธรรมะออนไลน์ ↗" }]} footer={<>{s.address}<br />โทร {s.phone}</>} />
+              <MobileNav items={nav} footer={<>{s.address}<br />โทร {s.phone}</>} />
             </div>
           </div>
         </header>
@@ -58,7 +66,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
             <div>
               <h2 className="mb-3 font-sans text-sm font-semibold text-grey">ติดต่อวัด</h2>
               <p className="text-muted">{s.address}</p>
-              <p className="mt-2"><a className="hover:text-brown" href={`tel:${s.phone.replace(/\D/g, "")}`}>โทร {s.phone}</a></p>
+              <p className="mt-2"><a className="hover:text-brown" href={`tel:${tel}`}>โทร {s.phone}</a></p>
               <p><a className="break-all hover:text-brown" href={`mailto:${s.email}`}>{s.email}</a></p>
               {s.lineId && <p>LINE: {s.lineId}</p>}
             </div>
@@ -72,6 +80,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
               <h2 className="mb-3 font-sans text-sm font-semibold text-grey">ช่องทางอื่น</h2>
               <ul className="space-y-1.5">
                 <li><a className="text-muted hover:text-brown" href={s.facebook} target="_blank" rel="noopener">Facebook เพจวัดป่ามหาไชย</a></li>
+                {s.youtube && <li><a className="text-muted hover:text-brown" href={s.youtube} target="_blank" rel="noopener">YouTube ช่องวัดป่ามหาไชย</a></li>}
                 <li><a className="text-muted hover:text-brown" href={s.libraryUrl} target="_blank" rel="noopener">ห้องสมุดธรรมะออนไลน์</a></li>
                 <li><Link className="text-muted hover:text-brown" href="/news">ข่าวสารของวัด</Link></li>
                 <li><Link className="text-muted hover:text-brown" href="/gallery">คลังภาพกิจกรรม</Link></li>

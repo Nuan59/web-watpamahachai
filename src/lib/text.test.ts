@@ -34,6 +34,10 @@ describe("renderMarkdown", () => {
     expect(html).not.toContain("<script>");
     expect(html).not.toContain("<img src=x");
   });
+  it("embeds a YouTube link that stands alone in its paragraph", () => {
+    expect(renderMarkdown("ดูคลิป\n\nhttps://youtu.be/dQw4w9WgXcQ")).toContain('src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ"');
+    expect(renderMarkdown("ดูคลิปที่ https://youtu.be/dQw4w9WgXcQ นะ")).not.toContain("<iframe");
+  });
   it("neutralises javascript: links and images", () => {
     expect(renderMarkdown("[x](javascript:alert(1))")).toContain('href="#"');
     expect(renderMarkdown("![x](javascript:alert(1))")).toContain('src="#"');

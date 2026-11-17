@@ -1,4 +1,5 @@
 import { CONTENT_TYPES, readUpload } from "@/lib/storage";
+import { attachment, downloadName } from "@/lib/media";
 
 // Everything uploaded through the back office is public content (photos, covers, audio, QR).
 // Only keys under public/ are ever served.
@@ -10,6 +11,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ key: str
   const ext = key.split(".").pop() ?? "";
   const type = CONTENT_TYPES[ext] ?? "application/octet-stream";
   const headers: Record<string, string> = { "content-type": type, "cache-control": "public, max-age=31536000, immutable", "x-content-type-options": "nosniff", "accept-ranges": "bytes" };
+  // ?dl=<title> asks the browser to save the file under a readable name (download buttons).
+  const dl = new URL(req.url).searchParams.get("dl");
+  if (dl !== null || ext === "zip") headers["content-disposition"] = attachment(downloadName(dl || "ไฟล์", ext));
   // Audio players seek with Range requests.
   const range = req.headers.get("range")?.match(/^bytes=(\d*)-(\d*)$/);
   if (range && type.startsWith("audio/")) {

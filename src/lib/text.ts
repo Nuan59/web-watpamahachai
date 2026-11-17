@@ -1,4 +1,5 @@
 import { marked } from "marked";
+import { youtubeEmbed, youtubeId } from "./media";
 
 /** URL slug that keeps Thai letters: "ทอดกฐิน 2569!" → "ทอดกฐิน-2569". */
 export function slugify(s: string) {
@@ -41,6 +42,15 @@ export function renderMarkdown(md: string): string {
     const inner = this.parser.parseInline(tokens);
     const ext = /^https?:/i.test(href);
     return `<a href="${escapeHtml(safeUrl(href))}"${title ? ` title="${escapeHtml(title)}"` : ""}${ext ? ' target="_blank" rel="noopener"' : ""}>${inner}</a>`;
+  };
+  // A paragraph that is just a YouTube link becomes an embedded player.
+  const para = renderer.paragraph.bind(renderer);
+  renderer.paragraph = function (tok) {
+    const only = tok.tokens.length === 1 ? tok.tokens[0] : null;
+    const href = only && (only.type === "link" || only.type === "text") ? ("href" in only ? (only.href as string) : only.raw) : "";
+    const id = href ? youtubeId(href) : null;
+    if (id) return `<div class="video"><iframe src="${youtubeEmbed(id)}" title="วิดีโอ YouTube" loading="lazy" allow="encrypted-media; picture-in-picture" allowfullscreen></iframe></div>\n`;
+    return para(tok);
   };
   renderer.image = ({ href, title, text }) =>
     `<img src="${escapeHtml(safeUrl(href))}" alt="${escapeHtml(text)}"${title ? ` title="${escapeHtml(title)}"` : ""} loading="lazy">`;

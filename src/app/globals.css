@@ -69,6 +69,8 @@ h4 { font-weight: 600; line-height: 1.4; }
 .prose-wat li::marker { color: var(--color-brown); }
 .prose-wat blockquote { border-left: 3px solid var(--color-brown); padding-left: 1em; font-family: var(--font-display); color: var(--color-brown-dark); }
 .prose-wat img { width: 100%; height: auto; border-radius: 8px; }
+.prose-wat .video, .video-box { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 8px; background: #000; }
+.prose-wat .video iframe, .video-box iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .prose-wat table { width: 100%; border-collapse: collapse; }
 .prose-wat th, .prose-wat td { border-bottom: 1px solid var(--color-line); padding: .4em .6em; text-align: left; }
 

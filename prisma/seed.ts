@@ -14,7 +14,7 @@ const plus = (n: number) => day(isoDay(new Date(Date.now() + n * 86400000)));
 async function main() {
   if ((await prisma.user.count()) > 0) {
     if (process.env.SEED_RESET !== "1") throw new Error("Database already has accounts. Run with SEED_RESET=1 to wipe and reseed.");
-    for (const m of ["activityLog", "registration", "event", "post", "photo", "album", "audioTrack", "quote", "faq", "page", "message", "scheduleItem", "setting", "homeSlide", "user"] as const) {
+    for (const m of ["activityLog", "registration", "event", "post", "photo", "album", "quote", "faq", "page", "message", "scheduleItem", "setting", "homeSlide", "libraryDoc", "monk", "audioTrack", "audioSeries", "user"] as const) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (prisma[m] as any).deleteMany();
     }
@@ -82,6 +82,27 @@ async function main() {
     copyFileSync(path.join(__dirname, "seed-images", file), keyToPath(key));
     await prisma.homeSlide.create({ data: { imageKey: key, title, caption, linkUrl, sort: n } });
   }
+
+  // The old website's menu, as drafts: they appear on the site once the temple adds content and ticks "แสดงบนเว็บไซต์".
+  const outline: [string, string, string][] = [
+    ["ประวัติ", "ประวัติเจ้าอาวาส", "## บ้านเกิด\n\n## การบรรพชาและอุปสมบท\n\n## การศึกษา\n\n## ตำแหน่งและสมณศักดิ์"],
+    ["ประวัติ", "ประวัติคณะธรรมยุต", "## ผู้ประดิษฐานคณะธรรมยุต\n\n## ความเป็นมา"],
+    ["ประวัติ", "ประวัติพระป่า", "## ความเป็นมา"],
+    ["ปฏิบัติธรรม", "ปฏิบัติธรรมวันพระ", "## กำหนดการ\n\n## การเตรียมตัว"],
+    ["ปฏิบัติธรรม", "ปฏิบัติธรรมวันสำคัญ", "## วันมาฆบูชา\n\n## วันวิสาขบูชา\n\n## วันอาสาฬหบูชา\n\n## วันเข้าพรรษา"],
+    ["ปฏิบัติธรรม", "อุปสมบทหมู่", "## กำหนดการ\n\n## คุณสมบัติและการสมัคร (ต้องมาสมัครด้วยตนเอง)\n\n## สิ่งที่ต้องเตรียม"],
+    ["ปฏิบัติธรรม", "บวชชีพราหมณ์", "## ระเบียบข้อปฏิบัติระหว่างเข้าปฏิบัติธรรม\n\n## จุดลงทะเบียนและสถานที่ในวัด\n\n## ศีล ๘"],
+    ["กิจกรรม", "ด้านการศึกษา", "## การศึกษาพระธรรมวินัย\n\n## นักธรรมและบาลี"],
+    ["กิจกรรม", "การปกครอง", "## ระเบียบการปกครองภายในวัด"],
+    ["กิจกรรม", "ด้านการสงเคราะห์สังคม", "## กิจกรรมช่วยเหลือสังคม"],
+    ["กิจกรรม", "ผ้าป่าทองคำ", "## ความเป็นมา\n\n## ร่วมทำบุญ"],
+    ["กิจกรรม", "มูลนิธิบุญประกอบปัญญา", "## วัตถุประสงค์ของมูลนิธิ\n\n## ติดต่อมูลนิธิ"],
+  ];
+  for (const [n, [navGroup, title, body]] of outline.entries())
+    await prisma.page.create({ data: { navGroup, title, slug: title.replace(/\s+/g, "-"), body, published: false, sort: n } });
+  const seriesNames = ["ธรรมกำไรชีวิต", "ธรรมีกถาเย็น", "พระไตรปิฎก", "เทศนาพระอุบาลีคุณูปมาจารย์ สิริจนฺโท", "ประวัติพระอาจารย์มั่น", "ปฏิปทาพระธุดงคกรรมฐาน", "คติธรรม"];
+  for (const [n, title] of seriesNames.entries())
+    await prisma.audioSeries.create({ data: { title, slug: title.replace(/\s+/g, "-"), speaker: "พระอาจารย์มหาประกอบ ธมฺมชีโว", published: false, sort: n } });
 
   console.log(`Seeded. Logins (password "${PW}"): owner@ / office@ / editor@watpamahachai.test`);
 }

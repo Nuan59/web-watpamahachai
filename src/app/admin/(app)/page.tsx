@@ -16,17 +16,22 @@ export default async function Dashboard() {
     prisma.event.findMany({ where: { endDate: { gte: t } }, orderBy: { startDate: "asc" }, take: 5, include: { _count: { select: { registrations: { where: { status: { not: "CANCELLED" } } } } } } }),
     can(u, "registrations", "view") ? prisma.registration.findMany({ where: { status: "NEW" }, orderBy: { createdAt: "desc" }, take: 6, include: { event: { select: { title: true } } } }) : [],
     can(u, "messages", "view") ? prisma.message.findMany({ where: { readAt: null }, orderBy: { createdAt: "desc" }, take: 5 }) : [],
-    Promise.all([prisma.post.count({ where: { status: "PUBLISHED" } }), prisma.post.count({ where: { status: "DRAFT" } }), prisma.audioTrack.count(), prisma.photo.count()]),
+    Promise.all([prisma.post.count({ where: { status: "PUBLISHED" } }), prisma.post.count({ where: { status: "DRAFT" } }), prisma.audioTrack.count(), prisma.photo.count(), prisma.page.count({ where: { published: false } }), prisma.audioSeries.count({ where: { published: false } })]),
     getSettings(),
   ]);
   const todo = can(u, "settings", "view") ? missing(s) : [];
-  const [pub, drafts, audio, photos] = counts;
+  const [pub, drafts, audio, photos, draftPages, draftSeries] = counts;
   return (
     <div className="space-y-5">
       <Head title={`สวัสดี ${u.name}`} />
       {todo.length > 0 && (
         <p className="rounded-md border border-warn/30 bg-warn-tint px-4 py-3 text-sm text-warn">
           ยังขาดข้อมูลวัด {todo.length} ช่อง (เช่น เลขบัญชีทำบุญ รูปเจ้าอาวาส) — <Link href="/admin/settings" className="font-semibold underline">กรอกที่ ข้อมูลวัด</Link>
+        </p>
+      )}
+      {(draftPages > 0 || draftSeries > 0) && (can(u, "pages", "view") || can(u, "dhamma", "view")) && (
+        <p className="rounded-md border border-brown/30 bg-brown-tint px-4 py-3 text-sm text-brown-dark">
+          มีเมนูที่ยังรอใส่เนื้อหา: {draftPages > 0 && <Link href="/admin/pages" className="font-semibold underline">หน้าเนื้อหา {draftPages} หน้า</Link>}{draftPages > 0 && draftSeries > 0 && " · "}{draftSeries > 0 && <Link href="/admin/dhamma" className="font-semibold underline">ชุดเสียงธรรม {draftSeries} ชุด</Link>} — ใส่เนื้อหาแล้วติ๊ก “แสดงบนเว็บไซต์” เมนูจะขึ้นบนเว็บเอง
         </p>
       )}
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">

@@ -16,7 +16,7 @@ export function PostForm({ p }: { p?: Post }) {
         <div className="space-y-4">
           <Field label="หัวข้อข่าว"><input name="title" required defaultValue={p?.title} className="input text-lg" /></Field>
           <Field label="คำโปรย" hint="ข้อความสั้น ๆ ใต้หัวข้อ และที่แสดงตอนแชร์ลิงก์ เว้นว่างได้ ระบบจะตัดจากเนื้อหาให้"><textarea name="excerpt" rows={2} defaultValue={p?.excerpt} className="input" /></Field>
-          <MdEditor name="body" defaultValue={p?.body} rows={18} />
+          <MdEditor name="body" defaultValue={p?.body} rows={18} imagesFor="news" />
         </div>
       </Panel>
       <div className="space-y-5">

@@ -11,8 +11,8 @@ export async function saveTempleSettings(f: FormData) {
   const u = await requirePerm("settings", "edit");
   const cur = await getSettings();
   const next: Partial<Settings> = {};
-  for (const k of SETTING_KEYS) if (!(IMAGES as readonly string[]).includes(k) && f.has(k)) next[k] = k === "history" ? String(f.get(k) ?? "").trim() : str(f, k);
-  for (const k of ["libraryUrl", "facebook"] as const) if (next[k] && !/^https:\/\//.test(next[k]!)) done("/admin/settings", { error: "ลิงก์ Facebook และห้องสมุดต้องขึ้นต้นด้วย https://" });
+  for (const k of SETTING_KEYS) if (!(IMAGES as readonly string[]).includes(k) && f.has(k)) next[k] = k === "history" || k === "videos" ? String(f.get(k) ?? "").trim() : str(f, k);
+  for (const k of ["libraryUrl", "facebook", "youtube", "radioUrl"] as const) if (next[k] && !/^https:\/\//.test(next[k]!)) done("/admin/settings", { error: "ลิงก์ Facebook, YouTube, วิทยุ และห้องสมุดต้องขึ้นต้นด้วย https://" });
   for (const k of IMAGES) {
     const up = file(f, k);
     if (up) {

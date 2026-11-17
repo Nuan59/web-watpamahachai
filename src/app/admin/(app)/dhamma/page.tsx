@@ -4,31 +4,21 @@ import { prisma } from "@/lib/db";
 import { thDate } from "@/lib/dates";
 import { audioSrc } from "@/lib/text";
 import { ConfirmSubmit, Submit } from "@/components/form";
-import { Check, Field, Flash, Head, Panel, Pill, type SP } from "../_ui";
-import { addQuote, deleteQuote, deleteTrack, saveTrack } from "./actions";
+import { Field, Flash, Head, Panel, Pill, type SP } from "../_ui";
+import Link from "next/link";
+import { TrackFields } from "./track-fields";
+import { addQuote, deleteQuote, deleteTrack, saveSeries, saveTrack } from "./actions";
 
 export const metadata = { title: "เสียงธรรมและโอวาท" };
 
-function TrackFields({ t }: { t?: { title: string; speaker: string; category: string; url: string; featured: boolean; sort: number; fileKey: string | null } }) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      <Field label="ชื่อเรื่อง" className="sm:col-span-2"><input name="title" required defaultValue={t?.title} className="input" /></Field>
-      <Field label="ผู้แสดงธรรม"><input name="speaker" defaultValue={t?.speaker} className="input" /></Field>
-      <Field label="หมวด" hint="เช่น ธรรมบรรยาย, บทสวดมนต์, นำนั่งสมาธิ"><input name="category" list="audio-cats" defaultValue={t?.category ?? "ธรรมบรรยาย"} className="input" /></Field>
-      <Field label={t?.fileKey ? "เปลี่ยนไฟล์เสียง" : "ไฟล์เสียง"} hint="MP3/M4A ไม่เกิน 80 MB"><input name="file" type="file" accept="audio/*" className="block w-full text-sm" /></Field>
-      <Field label="หรือ ลิงก์ Google Drive / ลิงก์ไฟล์เสียง" hint="ไฟล์ใน Drive ต้องแชร์แบบ “ทุกคนที่มีลิงก์”"><input name="url" defaultValue={t?.url} className="input" /></Field>
-      <Field label="ลำดับ" hint="เลขน้อยขึ้นก่อน"><input name="sort" type="number" defaultValue={t?.sort ?? 0} className="input" /></Field>
-      <div className="self-end"><Check name="featured" label="ให้เล่นเป็นเรื่องแรก (เรื่องเด่น)" defaultChecked={t?.featured} /></div>
-    </div>
-  );
-}
 
 export default async function DhammaAdmin({ searchParams }: { searchParams: SP }) {
   const u = await requirePerm("dhamma");
   const sp = await searchParams;
-  const [tracks, quotes] = await Promise.all([
-    prisma.audioTrack.findMany({ orderBy: [{ featured: "desc" }, { sort: "asc" }, { createdAt: "desc" }] }),
+  const [tracks, quotes, series] = await Promise.all([
+    prisma.audioTrack.findMany({ where: { seriesId: null }, orderBy: [{ featured: "desc" }, { sort: "asc" }, { createdAt: "desc" }] }),
     prisma.quote.findMany({ orderBy: { createdAt: "desc" } }),
+    prisma.audioSeries.findMany({ orderBy: [{ sort: "asc" }, { createdAt: "asc" }], include: { _count: { select: { tracks: true } } } }),
   ]);
   const cats = [...new Set(["ธรรมบรรยาย", "บทสวดมนต์", "นำนั่งสมาธิ", ...tracks.map((t) => t.category)])];
   return (
@@ -38,12 +28,32 @@ export default async function DhammaAdmin({ searchParams }: { searchParams: SP }
       <datalist id="audio-cats">{cats.map((c) => <option key={c} value={c} />)}</datalist>
       <div className="grid gap-5 2xl:grid-cols-[1.4fr_1fr]">
         <div className="space-y-5">
+          <Panel title={`ชุดเสียงธรรม (${series.length})`}>
+            <p className="hint mb-3">แต่ละชุดขึ้นเป็นเมนูย่อยใต้ “เสียงธรรม” เหมือนเว็บเดิม เช่น ธรรมกำไรชีวิต ธรรมีกถาเย็น พระไตรปิฎก</p>
+            {series.length > 0 && (
+              <ul className="mb-4 divide-y divide-cream">
+                {series.map((x) => (
+                  <li key={x.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                    <Link href={`/admin/dhamma/${x.id}`} className="font-medium underline-offset-2 hover:underline">{x.title}</Link>
+                    <span className="flex gap-1">{!x.published && <Pill>ซ่อน</Pill>}<Pill>{x._count.tracks} ไฟล์</Pill></span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            {can(u, "dhamma", "create") && (
+              <form action={saveSeries} className="flex flex-wrap items-end gap-3">
+                <Field label="สร้างชุดใหม่" className="min-w-60 flex-1"><input name="title" required placeholder="เช่น ธรรมกำไรชีวิต" className="input" /></Field>
+                <Field label="ผู้บรรยาย" className="min-w-48 flex-1"><input name="speaker" className="input" /></Field>
+                <Submit>สร้างชุด</Submit>
+              </form>
+            )}
+          </Panel>
           {can(u, "dhamma", "create") && (
-            <Panel title="เพิ่มเสียงธรรม">
-              <form action={saveTrack} className="space-y-3"><TrackFields /><Submit pendingText="กำลังอัปโหลด…">เพิ่มเสียงธรรม</Submit></form>
+            <Panel title="เพิ่มเสียงธรรมทีละเรื่อง">
+              <form action={saveTrack} className="space-y-3"><TrackFields series={series} /><Submit pendingText="กำลังอัปโหลด…">เพิ่มเสียงธรรม</Submit></form>
             </Panel>
           )}
-          <Panel title={`เสียงธรรมทั้งหมด (${tracks.length})`}>
+          <Panel title={`เสียงธรรมที่ไม่อยู่ในชุด (${tracks.length})`}>
             {tracks.length ? (
               <ul className="space-y-3">
                 {tracks.map((t) => {
@@ -59,7 +69,7 @@ export default async function DhammaAdmin({ searchParams }: { searchParams: SP }
                         {can(u, "dhamma", "edit") && (
                           <details className="w-full">
                             <summary className="cursor-pointer text-sm text-brown underline">แก้ไข</summary>
-                            <form action={saveTrack} className="mt-3 space-y-3"><input type="hidden" name="id" value={t.id} /><TrackFields t={t} /><Submit>บันทึก</Submit></form>
+                            <form action={saveTrack} className="mt-3 space-y-3"><input type="hidden" name="id" value={t.id} /><TrackFields t={t} series={series} /><Submit>บันทึก</Submit></form>
                           </details>
                         )}
                         {can(u, "dhamma", "delete") && <form action={deleteTrack}><input type="hidden" name="id" value={t.id} /><ConfirmSubmit message={`ลบ “${t.title}”?`}>ลบ</ConfirmSubmit></form>}

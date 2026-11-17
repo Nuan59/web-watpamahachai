@@ -13,7 +13,7 @@ export function PageForm({ p }: { p?: Pg }) {
       <Panel>
         <div className="space-y-4">
           <Field label="ชื่อหน้า"><input name="title" required defaultValue={p?.title} className="input text-lg" /></Field>
-          <MdEditor name="body" defaultValue={p?.body} rows={20} />
+          <MdEditor name="body" defaultValue={p?.body} rows={20} imagesFor="pages" />
         </div>
       </Panel>
       <Panel title="การแสดงผล">

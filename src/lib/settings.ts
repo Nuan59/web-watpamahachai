@@ -7,6 +7,7 @@ export const SETTING_DEFAULTS = {
   tagline: "สำนักปฏิบัติธรรมประจำจังหวัดสมุทรสาคร (ธรรมยุต) แห่งที่ ๑",
   motto: "ศึกษาธรรม นำปฏิบัติ พัฒนาจิต คิดค้นทางพ้นทุกข์",
   mottoBy: "โอวาทธรรม พระครูสิริสุตวราภรณ์",
+  abbotTitle: "พระครูสิริสุตวราภรณ์",
   abbotName: "พระมหาประกอบ ธมฺมชีโว",
   abbotRole: "เจ้าอาวาส ตั้งแต่วันที่ ๒๙ มิถุนายน พ.ศ. ๒๕๓๓ — ปัจจุบัน",
   abbotPhoto: "", // storage key
@@ -17,6 +18,11 @@ export const SETTING_DEFAULTS = {
   email: "mahachaiwatpa@gmail.com",
   facebook: "https://www.facebook.com/Watpamahachai/",
   lineId: "",
+  youtube: "https://www.youtube.com/channel/UCoR3jcrO2MW6HXnOmCN3-dQ",
+  radioUrl: "", // live stream address: .mp3 / .aac (Icecast/Shoutcast) or .m3u8 (HLS)
+  radioName: "วิทยุวัดป่ามหาไชย",
+  videos: "", // YouTube links, one per line, newest first
+  almsText: "ออกรับบิณฑบาต เวลา ๐๖.๑๕–๐๗.๑๕ น. ทุกวัน (วันพฤหัสบดีออกรับบิณฑบาตที่ตลาดมหาชัย)",
   hours: "",
   mapsQuery: "วัดป่ามหาไชย สมุทรสาคร",
   travelCar: "ค้นหา “วัดป่ามหาไชย สมุทรสาคร” ใน Google Maps แล้วกดนำทาง จากกรุงเทพฯ ใช้ถนนพระราม ๒ มุ่งหน้าจังหวัดสมุทรสาคร",

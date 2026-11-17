@@ -107,9 +107,28 @@ model ScheduleItem {
   sort     Int    @default(0)
 }
 
+/// A set of talks (ธรรมกำไรชีวิต, ธรรมีกถาเย็น, พระไตรปิฎก…). Shown in the เสียงธรรม menu.
+model AudioSeries {
+  id        String       @id @default(cuid())
+  slug      String       @unique
+  title     String
+  speaker   String       @default("")
+  summary   String       @default("")
+  coverKey  String?
+  zipKey    String? // uploaded "download the whole set" file
+  zipUrl    String       @default("") // or an outside link to it
+  published Boolean      @default(true)
+  sort      Int          @default(0)
+  createdAt DateTime     @default(now())
+  tracks    AudioTrack[]
+}
+
 /// Dhamma talks and chanting. Either an uploaded file (fileKey) or an outside link (url, e.g. Google Drive).
 model AudioTrack {
   id        String   @id @default(cuid())
+  seriesId  String?
+  series    AudioSeries? @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  downloadable Boolean @default(true)
   title     String
   speaker   String   @default("")
   category  String   @default("ธรรมบรรยาย")
@@ -191,4 +210,34 @@ model HomeSlide {
   sort      Int      @default(0)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+/// Books and documents to read or download (chanting books, Nak Tham / Pali study files…).
+model LibraryDoc {
+  id        String   @id @default(cuid())
+  title     String
+  category  String   @default("หนังสือสวดมนต์")
+  summary   String   @default("")
+  fileKey   String? // uploaded PDF / ZIP
+  url       String   @default("") // or an outside link
+  coverKey  String?
+  sort      Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([category, sort])
+}
+
+/// Monks of the temple (รายนามพระในสังกัด).
+model Monk {
+  id        String   @id @default(cuid())
+  name      String // ชื่อและฉายา
+  title     String   @default("") // สมณศักดิ์ เช่น พระครู…
+  position  String   @default("") // ตำแหน่ง เช่น เจ้าอาวาส
+  photoKey  String?
+  born      String   @default("") // free text, e.g. ๑๖ ก.ค. ๒๕๐๓
+  ordained  String   @default("")
+  education String   @default("") // นักธรรม / ป.ธ.
+  note      String   @default("")
+  sort      Int      @default(0)
+  published Boolean  @default(true)
 }

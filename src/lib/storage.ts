@@ -6,10 +6,13 @@ import { randomUUID } from "node:crypto";
 const root = () => path.resolve(process.env.UPLOAD_DIR ?? "uploads");
 const IMAGE: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
 const AUDIO: Record<string, string> = { "audio/mpeg": "mp3", "audio/mp3": "mp3", "audio/mp4": "m4a", "audio/x-m4a": "m4a", "audio/aac": "aac", "audio/ogg": "ogg", "audio/wav": "wav", "audio/x-wav": "wav" };
+const DOC: Record<string, string> = { "application/pdf": "pdf", "application/zip": "zip", "application/x-zip-compressed": "zip" };
+const DOC_EXT: Record<string, string> = { pdf: "pdf", zip: "zip" };
+export const MAX_DOC = 95 * 1024 * 1024;
 export const MAX_IMAGE = 10 * 1024 * 1024;
 export const MAX_AUDIO = 80 * 1024 * 1024;
 export const CONTENT_TYPES: Record<string, string> = {
-  jpg: "image/jpeg", png: "image/png", webp: "image/webp", mp3: "audio/mpeg", m4a: "audio/mp4", aac: "audio/aac", ogg: "audio/ogg", wav: "audio/wav",
+  jpg: "image/jpeg", png: "image/png", webp: "image/webp", mp3: "audio/mpeg", m4a: "audio/mp4", aac: "audio/aac", ogg: "audio/ogg", wav: "audio/wav", pdf: "application/pdf", zip: "application/zip",
 };
 
 export function keyToPath(key: string) {
@@ -21,11 +24,12 @@ export function keyToPath(key: string) {
 
 export class UploadError extends Error {}
 
-export async function saveUpload(file: File, folder: string, kind: "image" | "audio" = "image") {
-  const types = kind === "image" ? IMAGE : AUDIO;
-  const ext = types[file.type] ?? (kind === "audio" ? AUDIO_EXT[file.name.split(".").pop()?.toLowerCase() ?? ""] : undefined);
-  if (!ext) throw new UploadError(kind === "image" ? "รองรับเฉพาะรูป JPG, PNG หรือ WEBP" : "รองรับเฉพาะไฟล์เสียง MP3, M4A, AAC, OGG หรือ WAV");
-  const max = kind === "image" ? MAX_IMAGE : MAX_AUDIO;
+export async function saveUpload(file: File, folder: string, kind: "image" | "audio" | "doc" = "image") {
+  const types = kind === "image" ? IMAGE : kind === "audio" ? AUDIO : DOC;
+  const byName = file.name.split(".").pop()?.toLowerCase() ?? "";
+  const ext = types[file.type] ?? (kind === "audio" ? AUDIO_EXT[byName] : kind === "doc" ? DOC_EXT[byName] : undefined);
+  if (!ext) throw new UploadError({ image: "รองรับเฉพาะรูป JPG, PNG หรือ WEBP", audio: "รองรับเฉพาะไฟล์เสียง MP3, M4A, AAC, OGG หรือ WAV", doc: "รองรับเฉพาะไฟล์ PDF หรือ ZIP" }[kind]);
+  const max = { image: MAX_IMAGE, audio: MAX_AUDIO, doc: MAX_DOC }[kind];
   if (file.size > max) throw new UploadError(`ไฟล์ใหญ่เกิน ${max / 1024 / 1024} MB`);
   const key = `${folder}/${randomUUID()}.${ext}`;
   const p = keyToPath(key);

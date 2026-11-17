@@ -6,6 +6,13 @@ import { createPortal } from "react-dom";
 
 export type NavItem = { href: string; label: string; children?: { href: string; label: string }[] };
 
+/** Internal links go through next/link; outside links open in a new tab. */
+function L({ href, className, children, ...rest }: { href: string; className?: string; children: React.ReactNode; "aria-current"?: "page" | undefined }) {
+  return /^https?:/.test(href)
+    ? <a href={href} target="_blank" rel="noopener" className={className}>{children}</a>
+    : <Link href={href} className={className} {...rest}>{children}</Link>;
+}
+
 const isActive = (path: string, href: string) => (href === "/" ? path === "/" : path === href || path.startsWith(href + "/"));
 
 export function DesktopNav({ items }: { items: NavItem[] }) {
@@ -23,10 +30,10 @@ export function DesktopNav({ items }: { items: NavItem[] }) {
             {i.children && <span aria-hidden className="ml-1 text-xs">▾</span>}
           </Link>
           {i.children && (
-            <ul className="invisible absolute left-1/2 top-full z-40 min-w-48 -translate-x-1/2 rounded-lg border border-line bg-white p-1.5 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-              {[{ href: i.href, label: i.label }, ...i.children].map((c) => (
-                <li key={c.href}>
-                  <Link href={c.href} className="block rounded-md px-3 py-2 text-sm text-ink hover:bg-cream hover:text-brown-dark">{c.label}</Link>
+            <ul className="invisible absolute left-1/2 top-full z-40 max-h-[70vh] min-w-52 -translate-x-1/2 overflow-y-auto rounded-lg border border-line bg-white p-1.5 opacity-0 shadow-lg transition group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              {i.children.map((c) => (
+                <li key={c.href + c.label}>
+                  <L href={c.href} className="block whitespace-nowrap rounded-md px-3 py-2 text-sm text-ink hover:bg-cream hover:text-brown-dark">{c.label}</L>
                 </li>
               ))}
             </ul>
@@ -68,7 +75,7 @@ export function MobileNav({ items, footer }: { items: NavItem[]; footer: React.R
                   {i.children && (
                     <ul className="mb-2 ml-3 border-l border-line pl-3">
                       {i.children.map((c) => (
-                        <li key={c.href}><Link href={c.href} className="flex min-h-11 items-center text-muted">{c.label}</Link></li>
+                        <li key={c.href + c.label}><L href={c.href} className="flex min-h-11 items-center text-muted">{c.label}</L></li>
                       ))}
                     </ul>
                   )}
