@@ -3,15 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p ${PORT:-3030}",
+    "dev": "next dev -p 3030",
     "build": "next build",
-    "start": "next start -p ${PORT:-3030}",
+    "start": "next start -p 3030",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "seed": "tsx prisma/seed.ts",
     "db:push": "prisma db push",
-    "e2e": "node e2e/sweep.mjs"
+    "e2e": "node e2e/sweep.mjs",
+    "setup": "node scripts/setup.mjs",
+    "backup": "node scripts/backup.mjs"
   },
   "dependencies": {
     "@fontsource/sarabun": "^5.3.0",
@@ -37,5 +39,7 @@
     "typescript": "^5",
     "vitest": "^3.2.7"
   },
-  "prisma": { "seed": "tsx prisma/seed.ts" }
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
 }

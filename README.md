@@ -14,8 +14,29 @@ npm install
 cp .env.example .env          # ตั้ง SESSION_SECRET เป็นข้อความสุ่มยาว ๓๒ ตัวขึ้นไป และ SITE_URL
 npx prisma db push            # สร้าง prisma/dev.db
 npm run seed                  # ข้อมูลตั้งต้น (ไม่ยอมรันถ้ามีบัญชีอยู่แล้ว; SEED_RESET=1 = ล้างแล้วใส่ใหม่)
+# หรือแทนสามบรรทัดบน: npm run setup
 npm run dev                   # http://localhost:3030   (หรือ npm run build && npm start)
 ```
+
+## ติดตั้งบนคอมพิวเตอร์ของตัวเอง (Windows / Mac / Linux)
+
+ต้องมี [Node.js](https://nodejs.org) เวอร์ชัน 20 ขึ้นไป (เลือก LTS) และ Git
+
+```bash
+git clone https://github.com/Nuan59/web-watpamahachai.git
+cd web-watpamahachai
+git checkout claude/quirky-bell-f249rx
+npm install
+npm run setup      # สร้าง .env + ฐานข้อมูล + ข้อมูลตั้งต้น (รันซ้ำได้ ไม่ลบข้อมูล)
+npm run build
+npm start          # เปิด http://localhost:3030
+```
+
+- เปิดจากมือถือหรือเครื่องอื่นในบ้าน/วัด (Wi-Fi เดียวกัน): ใช้ `http://<IP ของคอมเครื่องนี้>:3030` (ดู IP ด้วย `ipconfig` บน Windows หรือ `ipconfig getifaddr en0` บน Mac) ถ้าเปิดไม่ได้ ให้อนุญาต Node.js ใน Firewall
+- ปิดหน้าต่าง terminal = เว็บหยุด ถ้าอยากให้รันค้างไว้ ใช้ `npx pm2 start npm --name wat -- start`
+- สำรองข้อมูล: `npm run backup` (คัดลอกฐานข้อมูลและรูป/เสียงไปที่ `backups/`) แล้วเอาโฟลเดอร์นั้นไปเก็บที่อื่นด้วย
+- อัปเดตโค้ดใหม่: `git pull` → `npm install` → `npm run setup` → `npm run build` → `npm start` (ข้อมูลเดิมไม่หาย)
+- จะเปิดให้คนนอกเข้าทางอินเทอร์เน็ต ต้องมีโดเมนและ HTTPS ก่อน (เช่น Cloudflare Tunnel) แล้วลบบรรทัด `INSECURE_COOKIE=1` ใน `.env`
 
 ## บัญชีตั้งต้น (จาก seed)
 
